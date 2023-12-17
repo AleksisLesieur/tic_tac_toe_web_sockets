@@ -1,0 +1,91 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+header .names {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+header .names div:nth-child(1) {
+  color: green;
+}
+header .names div:nth-child(3) {
+  color: red;
+}
+header .scores {
+  display: flex;
+  justify-content: center;
+}
+header .scores span {
+  padding: 10px;
+}
+header .scores span:nth-child(1) {
+  color: green;
+}
+header .scores span:nth-child(3) {
+  color: red;
+}
+header div {
+  padding: 10px;
+  font-size: 32px;
+}
+@media (min-width: 400px) {
+  header div {
+    font-size: 40px;
+  }
+}
+@media (min-width: 480px) {
+  header div {
+    font-size: 48px;
+  }
+}
+@media (min-width: 768px) {
+  header div {
+    font-size: 56px;
+  }
+}
+@media (min-width: 1024px) {
+  header div {
+    font-size: 64px;
+  }
+}
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+main article.board {
+  width: 80vw;
+  height: 80vw;
+  max-width: 750px;
+  max-height: 750px;
+}
+main article.board .row {
+  display: flex;
+  height: 33.33%;
+  width: 100%;
+}
+main article.board .row:not(:first-child) {
+  border-top: 4px solid black;
+}
+main article.board .row .box {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(16px, 20vw, 180px);
+}
+main article.board .row .box:not(:first-child) {
+  border-left: 4px solid black;
+}
+button {
+  margin: 0 auto;
+  margin-top: 50px;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  font-size: 48px;
+}
