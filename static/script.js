@@ -1,10 +1,12 @@
 const boxes = document.querySelectorAll('.box')
 
-let currentPlayerFront = 'X'
+let currentPlayerFront = null
 
 let currentBox = null
 
 let clientId = Date.now()
+
+let receivedData;
 
     const  socket = new WebSocket(`ws://localhost:8000/ws/${clientId}`)
 
@@ -13,28 +15,13 @@ let clientId = Date.now()
         console.log(event)
     };
 
-    // socket.onmessage = function(event) {
-    //     try {
-    //         let receivedData = JSON.parse(event.data);
-    //         console.log(event.data)
-    //     } catch (e) {
-    //         console.error('Error parsing JSON:', e);
-    //     }
-    // }
     socket.onmessage = function (event) {
-        // let receivedData = Number(event.data[event.data.length - 1])
-        // console.log(receivedData)
-        // console.log(typeof receivedData)
-        // console.log('on message has been loaded')
-        // console.log(event.data);
-        // console.log('console logging event data')
-        // boardData['explicitOriginalTarget'].textContent = temp
-        // boxes[receivedData].textContent = temp
-        let receivedData = JSON.parse(event.data)
-        // console.log(receivedData)
-        for (let i=0; i<9; i++) {
+        receivedData = JSON.parse(event.data)
+        console.log(receivedData)
+        for (let i= 0; i<9; i++) {
             boxes[i].textContent = receivedData['board'][i]
         }
+        currentPlayerFront = receivedData['currentPlayer']
     };
 
     socket.onclose = function(e) {
@@ -51,32 +38,13 @@ console.log('boxes above this')
 
 boxes.forEach(function(element, index ){
     element.addEventListener('click', function(boardData) {
-        if (boardData['explicitOriginalTarget'].textContent === '') {
+        if (boxes[index].textContent === '') {
             // let temp = currentPlayer
             // currentPlayerFront = temp === 'X' ? 'O' : 'X'
             console.log("sending")
             socket.send(index.toString())
-
+            console.log(boxes[index].textContent)
+            // boardData['explicitOriginalTarget'].textContent = currentPlayerFront
         }
     })
 })
-
-// socket.onmessage = function (event) {
-//     let receivedData = JSON.parse(event.data)
-//     console.log(receivedData)
-//
-//     console.log('received data')
-// }
-    // receivedData.board.forEach((val, idx) => {
-    //     if (val !== null) {
-    //         boxes[idx].textContent = val;
-    //     }
-    // });
-
-    // Update current player
-    // boardData['explicitOriginalTarget'].textContent = receivedData.currentPlayer;
-
-
-// window.onload = function() {
-//     socket.send(JSON.stringify({ type: "pageLoad" }));
-// };
