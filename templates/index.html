@@ -9,6 +9,15 @@
    <link rel="icon" type="image/png" href="/static/tic-tac-toe.png">
 </head>
 <body>
+        <!-- Add this inside your <body> tag -->
+    <div class="firstPlayer secondPlayer">
+        <div class="modal">
+            <div class="modal-content">
+                <p>Waiting for the other player turn...</p>
+            </div>
+        </div>
+    </div>
+
     <header>
         <div class="names">
             <div>Aleksis</div>
@@ -41,9 +50,11 @@
         </article>
     </main>
 
-    <button>restart the game</button>
+    <a href="">
+        <button class="gameButton">restart the game</button>
+    </a>
 
     <script src="./../static/script.js"></script>
+
 </body>
 </html>
-
