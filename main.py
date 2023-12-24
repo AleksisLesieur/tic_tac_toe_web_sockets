@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
 
+
 app = FastAPI()
 
 app.add_middleware(
@@ -36,13 +37,21 @@ class BoxData(BaseModel):
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
+        self.connection_count = 0
 
     async def connect(self, websocket: WebSocket):
+        # if self.connection_count <= 2:
         await websocket.accept()
         self.active_connections.append(websocket)
+        self.connection_count += 1
+        # else:
+        #     await websocket.close(code=1003, reason='Room is full :(')
 
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
+        # if websocket in self.active_connections:
+            # self.active_connections.remove(websocket)
+            # self.connection_count -= 1
 
     async def send_personal_message(self, message: str, websocket: WebSocket):
         await websocket.send_text(message)
@@ -54,17 +63,13 @@ class ConnectionManager:
     async def reset(self):
         self.active_connections.clear()
 
-
 manager = ConnectionManager()
-
 
 class GameState:
     def __init__(self):
         self.board = [None] * 9
         self.current_player = 'X'
         self.last_player = None
-        self.first_player = False
-        self.second_player = False
         self.temporary_id = None
         # self.player2_id = None
 
@@ -73,10 +78,6 @@ class GameState:
             self.temporary_id = client_id
         # elif not self.player2_id and self.player1_id != client_id:
         #     self.player2_id = client_id
-
-    def switch_player(self, current_id):
-        self.first_player = self.temporary_id < current_id
-        self.second_player = self.temporary_id >= current_id
 
     def make_move(self, index: int, client_id):
         if self.last_player == client_id:
@@ -96,7 +97,6 @@ class GameState:
 
 game_state = GameState()
 
-
 @app.get("/")
 async def read_root(request: Request):
     return templates.TemplateResponse('index.html', {"request": request})
@@ -105,7 +105,6 @@ async def read_root(request: Request):
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: int):
     await manager.connect(websocket)
-    print(websocket)
     try:
         while True:
             data = await websocket.receive_text()
@@ -115,14 +114,19 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
             index = int(array_data[0])
             received_client_id = int(array_data[1])
             game_state.set_player_id(received_client_id)
-            game_state.switch_player(received_client_id)
-            print(game_state.first_player, game_state.second_player)
+
             if game_state.make_move(index, client_id):
-                await manager.broadcast(json.dumps(
-                    {"board": game_state.board, "currentPlayer": game_state.current_player,
-                     "firstPlayer": game_state.first_player, "secondPlayer": game_state.second_player}))
+                await manager.broadcast(json.dumps({
+                    "board": game_state.board,
+                    "currentPlayer": game_state.current_player,
+                    "playerId": received_client_id,
+                    "connectionCount": manager.connection_count,
+                    "playerIndex": index,
+                }))
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         await manager.reset()
-        await manager.broadcast(json.dumps({"type": "disconnection", "message": f"Player {client_id} disconnected"}))
         game_state.reset()
+        await manager.broadcast(json.dumps({"type": "disconnection", "message": f"Player {client_id} disconnected"}))
+
+

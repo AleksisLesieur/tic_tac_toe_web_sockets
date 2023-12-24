@@ -27,27 +27,31 @@ header .scores span:nth-child(1) {
 header .scores span:nth-child(3) {
   color: red;
 }
+
 header div {
   padding: 10px;
+}
+
+header div, .modal-content > span, .modal-content::after {
   font-size: 32px;
 }
 @media (min-width: 400px) {
-  header div {
+  header div, .modal-content > span, .modal-content::after  {
     font-size: 40px;
   }
 }
 @media (min-width: 480px) {
-  header div {
+  header div, .modal-content > span, .modal-content::after  {
     font-size: 48px;
   }
 }
 @media (min-width: 768px) {
-  header div {
+  header div, .modal-content > span, .modal-content::after  {
     font-size: 56px;
   }
 }
 @media (min-width: 1024px) {
-  header div {
+  header div, .modal-content > span, .modal-content::after  {
     font-size: 64px;
   }
 }
@@ -101,16 +105,8 @@ a:link {
 
 /* Add these styles */
 
-.firstPlayer {
-  display: none;
-}
-
-.secondPlayer {
-  display: none;
-}
-
 .modal {
-   /* Hidden by default */
+    /*display: none;*/
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
     left: 0;
@@ -124,8 +120,30 @@ a:link {
 
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
+    margin: 10% auto; /* 15% from the top and centered */
+    max-width: 1115px;
+    padding: 50px 20px;
+    width: 90%;
     border: 1px solid #888;
-    width: 80%; /* Could be more or less, depending on screen size */
+}
+
+
+.modal-content::after {
+    content: ".";
+    animation: dotAnimation 1.5s infinite;
+}
+
+@keyframes dotAnimation {
+    0%, 100% {
+        content: "";
+    }
+    25% {
+        content: ".";
+    }
+    50% {
+        content: "..";
+    }
+    75% {
+        content: "...";
+    }
 }
