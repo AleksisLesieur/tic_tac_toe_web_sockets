@@ -44,14 +44,16 @@ class ConnectionManager:
         await websocket.accept()
         self.active_connections.append(websocket)
         self.connection_count += 1
-        # else:
-        #     await websocket.close(code=1003, reason='Room is full :(')
+
+        if self.connection_count == 1:
+            await self.broadcast("waiting_for_player")
 
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
+        self.connection_count = 0
         # if websocket in self.active_connections:
-            # self.active_connections.remove(websocket)
-            # self.connection_count -= 1
+        #     self.active_connections.remove(websocket)
+        #     self.connection_count -= 1
 
     async def send_personal_message(self, message: str, websocket: WebSocket):
         await websocket.send_text(message)
@@ -76,8 +78,6 @@ class GameState:
     def set_player_id(self, client_id):
         if not self.temporary_id:
             self.temporary_id = client_id
-        # elif not self.player2_id and self.player1_id != client_id:
-        #     self.player2_id = client_id
 
     def make_move(self, index: int, client_id):
         if self.last_player == client_id:
@@ -128,5 +128,8 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
         await manager.reset()
         game_state.reset()
         await manager.broadcast(json.dumps({"type": "disconnection", "message": f"Player {client_id} disconnected"}))
+
+# async def update_modal():
+#     await manager.broadcast(json.dumps({"type": 'playerCount', "count": manager.connection_count}))
 
 

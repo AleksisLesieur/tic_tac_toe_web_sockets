@@ -6,28 +6,46 @@ let currentBox = null
 
 const modal = document.querySelector('.modal')
 
+const modalText = document.querySelector('.modal-text')
+
+let showModal = false
+
 let clientId = Date.now() - 1_703_023_345_436
 
+
 let receivedData;
+
 
 const socket = new WebSocket(`ws://localhost:8000/ws/${clientId}`)
 
 socket.onopen = function(event) {
     console.log('WebSocket connection established');
     console.log(event)
-    modal.style.display = "none";
+    modal.style.display = 'none'
 };
 
+socket.onclose = function(e) {
+    console.log('WebSocket connection closed', e);
+    // modal.style.display = "block";
+};
 
 socket.onmessage = function (event) {
+    console.log('on message event')
+    console.log(event)
+
+    if (event.data === "waiting_for_player") {
+        modal.style.display = 'block'
+        modalText.textContent = 'Waiting for the other player to connect'
+        return
+    }
+
     receivedData = JSON.parse(event.data)
     let temporaryId = clientId
     let receivedId = receivedData.playerId
-    let assignPlayer = Math.random()
     console.log(receivedData)
-    console.log(clientId)
     if (receivedId === temporaryId) {
         modal.style.display = "block";
+        modalText.textContent = 'Waiting for the other player turn'
     }
     else {
         modal.style.display = "none";
@@ -35,14 +53,11 @@ socket.onmessage = function (event) {
     for (let i = 0; i < 9; i++) {
         boxes[i].textContent = receivedData['board'][i]
     }
-    // settingData()
+    if (receivedData.type === 'playerCount') {
+        console.log(receivedData.count)
+    }
     currentPlayerFront = receivedData['currentPlayer']
-};
-
-socket.onclose = function(e) {
-    console.log('WebSocket connection closed', e);
-    // modal.style.display = "block";
-};
+}
 
 socket.onerror = function(err) {
     console.error('WebSocket error', err);
