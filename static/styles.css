@@ -3,16 +3,21 @@
   margin: 0;
   padding: 0;
 }
+
+header, main {
+  z-index: 0;
+}
+
 header .names {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
 }
 header .names div:nth-child(1) {
-  color: green;
+  color: red;
 }
 header .names div:nth-child(3) {
-  color: red;
+  color: green;
 }
 header .scores {
   display: flex;
@@ -94,11 +99,21 @@ button {
   font-size: 48px;
   text-decoration: none !important;
   list-style-type: none;
+  position: relative;
+  background-color: white !important;
+  z-index: 50;
+  cursor: pointer;
 }
 
 a:link {
   text-decoration: none !important;
   list-style-type: none;
+  position: relative;
+  z-index: 50;
+}
+
+.box {
+  cursor: pointer;
 }
 
 /* bandau modal stuff */
@@ -106,7 +121,6 @@ a:link {
 /* Add these styles */
 
 .modal {
-    /*display: none;*/
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
     left: 0;
@@ -127,7 +141,6 @@ a:link {
     border: 1px solid #888;
 }
 
-
 .modal-content::after {
     content: ".";
     animation: dotAnimation 1.5s infinite;
@@ -146,4 +159,24 @@ a:link {
     75% {
         content: "...";
     }
+}
+
+
+svg {
+      width: auto;
+      height: auto;
+    }
+    .path, .path2, .path3  {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: dash 1s linear forwards;
+}
+ .path2 {
+  animation-delay: 0.5s;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
