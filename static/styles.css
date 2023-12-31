@@ -13,10 +13,10 @@ header .names {
   justify-content: center;
   flex-wrap: wrap;
 }
-header .names div:nth-child(1) {
+header .names div:nth-child(1), header .scores span:nth-child(1) {
   color: red;
 }
-header .names div:nth-child(3) {
+header .names div:nth-child(3), header .scores span:nth-child(3) {
   color: green;
 }
 header .scores {
@@ -25,12 +25,6 @@ header .scores {
 }
 header .scores span {
   padding: 10px;
-}
-header .scores span:nth-child(1) {
-  color: green;
-}
-header .scores span:nth-child(3) {
-  color: red;
 }
 
 header div {
@@ -139,6 +133,7 @@ a:link {
     padding: 50px 20px;
     width: 90%;
     border: 1px solid #888;
+    box-shadow: 5px 5px 5px grey;
 }
 
 .modal-content::after {
@@ -161,12 +156,11 @@ a:link {
     }
 }
 
-
 svg {
       width: auto;
       height: auto;
     }
-    .path, .path2, .path3  {
+.path, .path2, .path3  {
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
   animation: dash 1s linear forwards;

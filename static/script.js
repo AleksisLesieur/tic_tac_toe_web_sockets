@@ -1,5 +1,9 @@
 const boxes = document.querySelectorAll(".box");
 
+const firstPlayer = document.querySelector('.player1')
+
+const secondPlayer = document.querySelector('.player2')
+
 let currentPlayerFront = null;
 
 let currentBox = null;
@@ -12,15 +16,6 @@ const modalText = document.querySelector(".modal-text");
 
 const dots = document.querySelector(".dots")
 
-// const svgO = `<svg viewBox="0 0 150 150">
-// <line path class="path" x1="10" y1="10" x2="140" y2="140" stroke="red" stroke-width="15"></line>
-// <line path class="path2" x1="10" y1="140" x2="140" y2="10" stroke="red" stroke-width="15"></line>
-// </svg>`
-//
-// const svgX = `<svg viewBox="0 0 150 150">
-// <circle id="my-circle" class="fill path3" cx="75" cy="75" r="65" fill="none" stroke="green" stroke-width="15" stroke-dasharray="900" />
-// </svg>`
-
 const svgX = `<svg width="150" height="150" viewBox="0 0 100 100">
   <line path class="path" x1="10%" y1="10%" x2="90%" y2="90%" stroke="red" stroke-width="7.5"></line>
   <line path class="path2" x1="10%" y1="90%" x2="90%" y2="10%" stroke="red" stroke-width="7.5"></line>
@@ -28,9 +23,18 @@ const svgX = `<svg width="150" height="150" viewBox="0 0 100 100">
 
 const svgO = `<svg width="150" height="150" viewBox="0 0 100 100">
   <circle id="my-circle" class="fill path3" cx="50%" cy="50%" r="43.333%" fill="none" stroke="green" stroke-width="7.5" stroke-dasharray="565.4867" />
-</svg>`;
+</svg>`
 
+// const svgX = `<svg width="75" height="75" viewBox="0 0 75 75">
+//   <line path class="path" x1="10%" y1="10%" x2="90%" y2="90%" stroke="red" stroke-width="7.5"></line>
+//   <line path class="path2" x1="10%" y1="90%" x2="90%" y2="10%" stroke="red" stroke-width="7.5"></line>
+// </svg>`;
+//
+// const svgO = `<svg width="75" height="75" viewBox="0 0 75 75">
+//   <circle id="my-circle" class="fill path3" cx="50%" cy="50%" r="43.333%" fill="none" stroke="green" stroke-width="7.5" stroke-dasharray="565.4867" />
+// </svg>`;
 
+// let currentSymbol;
 
 // Create a style element
 const style = document.createElement('style');
@@ -54,9 +58,25 @@ let receivedData;
 
 const socket = new WebSocket(`ws://localhost:8000/ws/${clientId}`);
 
+let svgStyleAppended = false
+
+document.addEventListener('DOMContentLoaded', function() {
+  fetch('https://ntfy.sh/visited_my_page', {
+    method: 'POST', // PUT works too
+    body: `someone with game ID ${clientId} just joined!`
+})
+  // modal.style.display = 'block'
+  // modalText.textContent = "Welcome! you're about to play a game of tic-tac-toe with me! The moment you submit your name I will receive a notification on my phone to join the game!"
+})
+
 socket.onopen = function (event) {
   console.log("WebSocket connection established");
   console.log(event);
+  // if (!svgStyleAppended) {
+  //   document.head.appendChild(style);
+  //   svgStyleAppended = true
+  // }
+
   modal.style.display = "none";
 };
 
@@ -64,10 +84,6 @@ socket.onclose = function (e) {
   console.log("WebSocket connection closed", e);
   // modal.style.display = "block";
 };
-
-window.onbeforeunload = function () {
-  return socket.close()
-}
 
 socket.onmessage = function (event) {
   console.log("on message event");
@@ -78,12 +94,7 @@ socket.onmessage = function (event) {
     modalText.textContent = "Please wait! I'll login shortly";
     return;
   }
-  //   else if (event.data === 'logged_in' + `${clientId}`) {
-  //   modal.style.display = "block";
-  //   modalText.textContent = "I've just logged in, thinking of my first move";
-  //   return;
 
-  // }
     else if (event.data === "full_room") {
     modal.style.display = "block";
     modalText.textContent = "Sorry, the room is currently full, please try again later!";
@@ -91,7 +102,7 @@ socket.onmessage = function (event) {
     return;
   } else if (event.data === "player_dc") {
     modal.style.display = "block";
-    modalText.textContent = 'The player has disconnected, please click "restart the game" button or refresh the page';
+    modalText.textContent = 'The player has disconnected, please click "restart the game" button or refresh the page!';
     document.head.appendChild(style);
     return;
   }
@@ -107,18 +118,26 @@ socket.onmessage = function (event) {
     modal.style.display = "none";
   }
   for (let i = 0; i < 9; i++) {
-    // boxes[i].textContent = receivedData["board"][i];
-    let playerSymbol = receivedData["board"][i];
-    if (playerSymbol === 'X') {
-      boxes[i].innerHTML = svgX
-    } else if (playerSymbol === 'O') {
-      boxes[i].innerHTML = svgO
-    }
+    // currentSymbol = receivedData["board"][i];
+    // if (currentSymbol === 'X') {
+    //   boxes[i].innerHTML = svgX
+    // } else if (currentSymbol === 'O') {
+    //   boxes[i].innerHTML = svgO
+    // }
+    const currentSymbol = receivedData["board"][i];
+
+    if (boxes[i].dataset.symbol === currentSymbol) continue;
+    // Create a new SVG element
+    const newSvg = document.createElement("div");
+    newSvg.innerHTML = currentSymbol === 'X' ? svgX : (currentSymbol === 'O' ? svgO : "");
+    boxes[i].innerHTML = ''
+    boxes[i].appendChild(newSvg)
+    boxes[i].dataset.symbol = currentSymbol;
   }
   if (receivedData.type === "playerCount") {
     console.log(receivedData.count);
   }
-  currentPlayerFront = receivedData["currentPlayer"];
+  // currentPlayerFront = receivedData["currentPlayer"];
 };
 
 socket.onerror = function (err) {
