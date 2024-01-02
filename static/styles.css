@@ -4,6 +4,7 @@
   padding: 0;
 }
 
+
 header, main {
   z-index: 0;
 }
@@ -84,7 +85,7 @@ main article.board .row .box {
 main article.board .row .box:not(:first-child) {
   border-left: 4px solid black;
 }
-button {
+.gameButton {
   margin: 0 auto;
   margin-top: 50px;
   padding: 10px;
@@ -174,3 +175,87 @@ svg {
     stroke-dashoffset: 0;
   }
 }
+
+body {
+            font-family: Arial, sans-serif;
+    position: relative;
+        }
+body.modal-open {
+            z-index: 5000;
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        .greetings, label{
+            font-size: 2em;
+        }
+
+        input, #saveButton {
+            font-size: 1.5em;
+        }
+
+        input::placeholder {
+            font-size: 1.2em;
+        }
+
+        .nameModal {
+            overflow: hidden;
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+        }
+
+        .nameModal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 100px 40px; /* Increased padding for a bigger nameModal */
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .greetings {
+            font-weight: bold;
+            /*font-size: 1.2em;*/
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            align-self: flex-start;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            text-align: justify;
+        }
+
+        input {
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        #saveButton {
+            width: 100%;
+            padding: 10px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        #saveButton:disabled {
+            background-color: #ccc; /* Set a different background color for disabled state */
+            cursor: default; /* Set cursor to default for the disabled state */
+        }
+
+        .opacity {
+            opacity: 0;
+        }

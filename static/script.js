@@ -8,6 +8,8 @@ let currentPlayerFront = null;
 
 let currentBox = null;
 
+let namedSubmited = false
+
 const modal = document.querySelector(".modal");
 
 const modalContent = document.querySelector('.modal-content');
@@ -60,15 +62,6 @@ const socket = new WebSocket(`ws://localhost:8000/ws/${clientId}`);
 
 let svgStyleAppended = false
 
-document.addEventListener('DOMContentLoaded', function() {
-  fetch('https://ntfy.sh/visited_my_page', {
-    method: 'POST', // PUT works too
-    body: `someone with game ID ${clientId} just joined!`
-})
-  // modal.style.display = 'block'
-  // modalText.textContent = "Welcome! you're about to play a game of tic-tac-toe with me! The moment you submit your name I will receive a notification on my phone to join the game!"
-})
-
 socket.onopen = function (event) {
   console.log("WebSocket connection established");
   console.log(event);
@@ -118,12 +111,6 @@ socket.onmessage = function (event) {
     modal.style.display = "none";
   }
   for (let i = 0; i < 9; i++) {
-    // currentSymbol = receivedData["board"][i];
-    // if (currentSymbol === 'X') {
-    //   boxes[i].innerHTML = svgX
-    // } else if (currentSymbol === 'O') {
-    //   boxes[i].innerHTML = svgO
-    // }
     const currentSymbol = receivedData["board"][i];
 
     if (boxes[i].dataset.symbol === currentSymbol) continue;
@@ -156,3 +143,55 @@ boxes.forEach(function (element, index) {
   });
 });
 
+// input name player modal
+
+    const nameModal = document.getElementById('myModal');
+    const nameInput = document.getElementById('nameInput');
+    const saveButton = document.getElementById('saveButton');
+    const opacity = document.querySelectorAll('.opacity')
+    let userName = ''
+
+    function openModal() {
+        nameModal.style.display = 'block';
+    }
+
+    function toggleButton() {
+        saveButton.disabled = nameInput.value.trim() === '';
+    }
+
+    function saveName() {
+        userName = nameInput.value;
+
+        // You can use the userName variable as needed, for example, display it in the console
+        console.log(`Hello, ${userName}!`);
+
+        // Close the nameModal after saving the name
+        closeModal();
+    }
+
+    function closeModal() {
+        nameModal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+        opacity.forEach(function (element ) {
+            element.classList.remove('opacity')
+        })
+        fetch('https://ntfy.sh/visited_my_page', {
+            method: 'POST', // PUT works too
+            body: `someone with name ${userName} just joined!`
+        })
+        secondPlayer.textContent = userName
+        // socket.send(userName)
+    }
+
+    // Open the nameModal when the page loads (you can trigger this event based on user interaction)
+    window.onload = function () {
+        openModal();
+        toggleButton(); // Initial call to set the button state based on input
+    };
+
+    // Listen for the "Enter" key press
+    nameInput.addEventListener('keyup', function(event) {
+        if (event.key === 'Enter' && !saveButton.disabled) {
+            saveName();
+        }
+    });

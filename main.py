@@ -80,6 +80,7 @@ class GameState:
         self.current_player = 'X'
         self.last_player = None
         self.temporary_id = None
+        self.player_name = None
 
     def set_player_id(self, client_id):
         if not self.temporary_id:
@@ -107,6 +108,8 @@ game_state = GameState()
 async def read_root(request: Request):
     return templates.TemplateResponse('index.html', {"request": request})
 
+# @app.get("/game")
+# async def read
 
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: int):
@@ -115,6 +118,8 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
         while True:
             data = await websocket.receive_text()
             array_data = json.loads(data)
+            print(array_data)
+            print('array data being printed')
             # add game logic here
             print(array_data)
             index = int(array_data[0])
