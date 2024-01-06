@@ -9,23 +9,23 @@
 </head>
 <body>
 
-    <div class="nameModal" id="myModal">
-        <div class="nameModal-content">
-            <div class="greetings">Greetings and welcome!</div>
-            <label for="nameInput">You're about to participate in an exciting game of tic-tac-toe with me. The moment you input your name, I'll receive a notification on my app called "ntfy" that someone is waiting for me to join</label>
-            <input type="text" id="nameInput" placeholder="Your Name" oninput="toggleButton()">
-            <button id="saveButton" onclick="saveName()" disabled>Save</button>
-        </div>
-    </div>
+<!--    <div class="nameModal" id="myModal">-->
+<!--        <div class="nameModal-content">-->
+<!--            <div class="greetings">Greetings and welcome!</div>-->
+<!--            <label for="nameInput">You're about to participate in an exciting game of tic-tac-toe with me. The moment you input your name, I'll receive a notification on my app called "ntfy" that someone is waiting for me to join</label>-->
+<!--            <input type="text" id="nameInput" placeholder="Your Name" oninput="toggleButton()">-->
+<!--            <button id="saveButton" onclick="saveName()" disabled>Save</button>-->
+<!--        </div>-->
+<!--    </div>-->
 
-    <div class="modal opacity">
+    <div class="modal">
         <div class="modal-content">
             <span class="modal-text">Waiting for the other player turn<span class="dots"></span></span>
         </div>
     </div>
 
 
-    <header class="opacity">
+    <header>
         <div class="names">
             <div class="player1">Aleksis</div>
             <div>vs</div>
@@ -37,7 +37,7 @@
             <span>0</span>
         </div>
     </header>
-    <main class="opacity">
+    <main>
         <article class="board">
             <div class="row">
                 <div class="box box1"></div>
@@ -57,7 +57,7 @@
         </article>
     </main>
 
-    <a href="" class="opacity">
+    <a href="">
         <button class="gameButton">restart the game</button>
     </a>
 

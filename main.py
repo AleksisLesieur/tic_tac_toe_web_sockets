@@ -104,12 +104,22 @@ class GameState:
 
 game_state = GameState()
 
+# @app.get("/")
+# async def read_root(request: Request):
+#     return templates.TemplateResponse('index.html', {"request": request})
+
 @app.get("/")
 async def read_root(request: Request):
-    return templates.TemplateResponse('index.html', {"request": request})
+    return templates.TemplateResponse('playerName.html', {"request": request})
 
-# @app.get("/game")
-# async def read
+@app.post("/")
+async def receive_name(data: str):
+    # game_state.player_name = data
+    return {"message": data}
+
+@app.get("/game")
+async def read_game(request: Request):
+    return templates.TemplateResponse('index.html', {"request": request})
 
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: int):

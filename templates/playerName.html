@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        position: relative;
+    }
+    body.modal-open {
+        z-index: 5000;
+        overflow: hidden; /* Prevent scrolling */
+    }
+
+    .greetings, label{
+        font-size: 2em;
+    }
+
+    input, #saveButton {
+        font-size: 1.5em;
+    }
+
+    input::placeholder {
+        font-size: 1.2em;
+    }
+
+    .nameModal {
+        overflow: hidden;
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 9999;
+    }
+
+    .nameModal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        padding: 100px 40px; /* Increased padding for a bigger nameModal */
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .greetings {
+        font-weight: bold;
+        /*font-size: 1.2em;*/
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    label {
+        align-self: flex-start;
+        margin-bottom: 20px;
+        line-height: 1.5;
+        text-align: justify;
+    }
+
+    input {
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+    #saveButton {
+        width: 100%;
+        padding: 10px;
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+
+    #saveButton:disabled {
+        background-color: #ccc; /* Set a different background color for disabled state */
+        cursor: default; /* Set cursor to default for the disabled state */
+    }
+
+    .opacity {
+        opacity: 0;
+    }
+    </style>
+</head>
+<body>
+
+<div class="nameModal" id="myModal">
+        <div class="nameModal-content">
+            <div class="greetings">Greetings and welcome!</div>
+            <label for="nameInput">You're about to participate in an exciting game of tic-tac-toe with me. The moment you input your name, I'll receive a notification on my phone that someone is waiting for me to join</label>
+            <input type="text" id="nameInput" placeholder="Your Name" oninput="toggleButton()">
+            <button id="saveButton" onclick="saveName()" disabled>Save</button>
+        </div>
+    </div>
+    <script>
+    const nameModal = document.getElementById('myModal');
+    const nameInput = document.getElementById('nameInput');
+    const saveButton = document.getElementById('saveButton');
+    let userName = 'Mkicas'
+
+    // saveButton.addEventListener('click', sendingName())
+
+    function openModal() {
+        nameModal.style.display = 'block';
+    }
+
+    function toggleButton() {
+        saveButton.disabled = nameInput.value.trim() === '';
+    }
+
+    function saveName() {
+        userName = nameInput.value;
+
+        // You can use the userName variable as needed, for example, display it in the console
+        console.log(`Hello, ${userName}!`);
+
+        // Close the nameModal after saving the name
+        closeModal();
+    }
+
+    function closeModal() {
+        nameModal.style.display = 'none';
+        fetch('https://ntfy.sh/visited_my_page', {
+            method: 'POST', // PUT works too
+            body: `someone with name ${userName} just joined!`
+        })
+        // secondPlayer.textContent = userName
+        location.href = 'http://localhost:8000/game'
+    }
+
+    async function sendingName() {
+         const response = await fetch('http://localhost:8000/', {
+             method: 'POST',
+             headers: {
+                 'Content-Type': 'text/plain',
+             },
+                body: userName,
+             });
+             if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+             }
+             const data = await response
+             console.log('Server response:', data);
+             console.log(userName)
+    }
+
+    // Open the nameModal when the page loads (you can trigger this event based on user interaction)
+    window.onload = function () {
+        openModal();
+        toggleButton(); // Initial call to set the button state based on input
+    };
+
+    // Listen for the "Enter" key press
+    nameInput.addEventListener('keyup', function(event) {
+        if (event.key === 'Enter' && !saveButton.disabled) {
+            saveName();
+        }
+    });
+    </script>
+</body>
+</html>
