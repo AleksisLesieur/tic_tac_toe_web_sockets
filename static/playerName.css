@@ -2,6 +2,7 @@ body {
     font-family: Arial, sans-serif;
     position: relative;
 }
+
 body.modal-open {
     z-index: 5000;
     overflow: hidden; /* Prevent scrolling */
@@ -21,7 +22,7 @@ input::placeholder {
 
 .nameModal {
     overflow: hidden;
-    display: none;
+    display: block;
     position: fixed;
     top: 0;
     left: 0;
