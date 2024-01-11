@@ -86,7 +86,7 @@ let showModal = false;
 
 let clientId = crypto.randomUUID()
 
-const socket = new WebSocket(`ws://localhost:8000/ws/${clientId}`);
+const socket = new WebSocket(`ws://localhost:8000/ws/lobby/${clientId}`);
 
 let svgStyleAppended = false
 
@@ -108,6 +108,12 @@ socket.onclose = function (e) {
 let messageType;
 let receivedData;
 let savedBoard = new Array(9).fill(null);
+
+
+window.addEventListener("load", (event) => {
+  firstPlayer.textContent = localStorage.getItem("firstName");
+  secondPlayer.textContent = localStorage.getItem("secondName");
+});
 
 socket.onmessage = function (event) {
   console.log("on message event");
@@ -132,7 +138,7 @@ socket.onmessage = function (event) {
     modal.style.display = "block"
     modalText.textContent = "The player has disconnected, please click 'restart the game' button or refresh the page!"
     document.head.appendChild(style)
-    return; // why it doesn't work without return here??? why the bottom code runs after this return???
+    return; // why it doesn't work without return here? why the bottom code runs after this return?
   }
 
   const temporaryId = clientId

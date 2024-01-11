@@ -24,6 +24,10 @@ class ConnectionManager:
         self.connection_count = 0
         self.first_move = 0
 
+    async def register_names(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         if self.connection_count < 2:
@@ -35,17 +39,11 @@ class ConnectionManager:
                     "message_type": "waiting_for_player"
                 }))
 
-            if self.connection_count == 2:
-                await self.broadcast(json.dumps({
-                    "message_type"
-                }))
-            
         else:
             await websocket.send_text(json.dumps({
                     "message_type": "full_room"
                 }))
             await websocket.close(code=1000)
-
 
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
@@ -98,12 +96,13 @@ class GameState:
         self.board = [None] * 9
         self.current_player = 'X'
 
+    # def begin_game(self)
+
 game_state = GameState()
 
-
-@app.get('/getUserName')
-async def get_username():
-    return {"message": 'data received!'}
+# @app.get('/getUserName')
+# async def get_username():
+#     return {"message": 'data received!'}
 
 @app.get("/")
 async def read_root(request: Request):
@@ -113,25 +112,32 @@ async def read_root(request: Request):
 async def read_game(request: Request):
     return templates.TemplateResponse('index.html', {"request": request})
 
-@app.websocket("/ws/{userName}")
-async def websocket_endpoint(websocket: WebSocket, userName: str):
+@app.websocket("/ws/user/{user_name}")
+async def websocket_endpoint_user(websocket: WebSocket, user_name: str):
     await manager.connect(websocket)
-    print(userName)
+    while True:
+        name = await websocket.receive_text()
+        game_state.set_player_name(name)
+        print(name)
+        print(game_state.first_name)
+        print(game_state.second_name)
+        if (game_state.first_name or game_state.second_name):
+            await manager.broadcast(json.dumps({
+                "message_type": "player_names",
+                "firstName": game_state.first_name,
+                "secondName": game_state.second_name,
+            }))
 
-@app.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: str):
+@app.websocket("/ws/lobby/{client_id}")
+async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
     await manager.connect(websocket)
-    print(client_id, ' client ID backend code')
     try:
         while True:
             data = await websocket.receive_text()
             array_data = json.loads(data)
-            print(array_data)
             index = int(array_data[0])
             received_client_id = array_data[1]
-            player_name = array_data[2]
             game_state.set_player_id(received_client_id)
-            game_state.set_player_name(player_name)
 
             if game_state.make_move(index, client_id):
                 await manager.broadcast(json.dumps({

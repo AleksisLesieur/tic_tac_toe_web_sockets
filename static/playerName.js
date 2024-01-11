@@ -1,7 +1,7 @@
 const nameModal = document.getElementById('myModal');
 const nameInput = document.getElementById('nameInput');
 const saveButton = document.getElementById('saveButton');
-let userName = ''
+let userName = 'default'
 
 // saveButton.addEventListener('click', sendingName())
 
@@ -15,17 +15,7 @@ window.onload = function () {
   toggleButton(); // Initial call to set the button state based on input
 };
 
-const socket = new WebSocket(`ws://localhost:8000/ws/${userName}`);
-
-// function saveName() {
-//     userName = nameInput.value;
-
-//     // You can use the userName variable as needed, for example, display it in the console
-//     console.log(`Hello, ${userName}!`);
-
-//     // Close the nameModal after saving the name
-//     closeModal();
-// }
+const socket = new WebSocket(`ws://localhost:8000/ws/user/${userName}`);
 
 function saveUserData() {
   userName = nameInput.value
@@ -51,72 +41,29 @@ function closeModal() {
       body: `someone with name ${userName} just joined!`
   })
     // secondPlayer.textContent = userName
-  // location.href = 'http://localhost:8000/game'
+  location.href = 'http://localhost:8000/game'
   socket.send(userName)
 }
 
-// async function sendingName(str) {
-//         const response = await fetch("http://localhost:8000/postUserName", {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//           },
-//           body: JSON.stringify({
-//             name: str,
-//           }),
-//         });
-    
-//         if (!response.ok) {
-//             throw new Error(`HTTP error! Status: ${response.status}`);
-//         }
-//         const data = await response.json()
-//         console.log('Server response:', data);
-//         console.log(userName)
-//         return data
-// }
+// For socket
+socket.onopen = event => {
+    console.log("WebSocket2 connection opened:", event);
+};
 
-// sendingName()
+socket.onclose = event => {
+    console.log("WebSocket2 connection closed:", event);
+};
 
-// Open the nameModal when the page loads (you can trigger this event based on user interaction)
+socket.onerror = event => {
+    console.error("WebSocket2 error:", event);
+};
 
-// Listen for the "Enter" key press
-// nameInput.addEventListener('keyup', function(event) {
-//     if (event.key === 'Enter' && !saveButton.disabled) {
-//         saveName();
-//     }
-// });
-
-// Get user IP address using a third-party service (for demonstration purposes)
-// document.addEventListener('DOMContentLoaded', function () {
-//   fetch('https://api64.ipify.org?format=json')
-//     .then(response => response.json())
-//     .then(data => {
-//       const userIP = data.ip;
-//       console.log('User IP address:', userIP);
-  
-//       // Now you can send this IP address to your FastAPI server
-//       // sendIPToServer(userIP);
-//     })
-//     .catch(error => console.error('Error fetching IP address:', error));
-  
-//   // function sendIPToServer(ip) {
-//   //   // You can use AJAX, fetch, or any other method to send the IP address to your FastAPI server
-//   //   // Example using fetch:
-//   //   fetch('https://your-fastapi-server.com/save-ip', {
-//   //     method: 'POST',
-//   //     headers: {
-//   //       'Content-Type': 'application/json',
-//   //     },
-//   //     body: JSON.stringify({ ip: ip }),
-//   //   })
-//   //   .then(response => response.json())
-//   //   .then(data => console.log('Server response:', data))
-//   //   .catch(error => console.error('Error sending IP to server:', error));
-//   // }
-// })
-
-// // async function sendData(str) {
-// //   fetch('localhost://8000/Alex', 'post' {
-
-// //   })
-// // }
+socket.onmessage = function (event) {
+  console.log("on message event");
+  let data = JSON.parse(event.data)
+  console.log(data)
+  if (data.message_type === 'player_names') {
+    localStorage.setItem("firstName", data.firstName)
+    localStorage.setItem("secondName", data.secondName);
+  }
+};
