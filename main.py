@@ -30,18 +30,27 @@ class ConnectionManager:
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
-        if self.connection_count < 2:
+        if self.connection_count < 3:
             self.active_connections.append(websocket)
             self.connection_count += 1
+            # self.connection_count = bool(game_state.first_player) + bool(game_state.second_player)
 
             if self.connection_count == 1:
                 await self.broadcast(json.dumps({
                     "message_type": "waiting_for_player"
                 }))
+                
+            # if self.connection_count == 2:
+            #     await manager.broadcast(json.dumps({
+            #         "message_type": "player_data",
+            #         "first_player": game_state.first_player,
+            #         "second_player": game_state.second_player,
+            #     }))
 
         else:
             await websocket.send_text(json.dumps({
-                    "message_type": "full_room"
+                    "message_type": "full_room",
+                    "playerCount": self.connection_count
                 }))
             await websocket.close(code=1000)
 
@@ -67,22 +76,27 @@ class GameState:
         self.current_player = 'X'
         self.last_player = None
         self.temporary_id = None
-        self.first_name = ''
-        self.second_name = ''
+        self.first_player = {}
+        self.second_player = {}
 
-    def set_player_name(self, player_name: str):
-        if self.first_name == '':
-            self.first_name = player_name
+    def is_board_empty(board):
+        return all(element is None for element in board)
+
+    def set_player_data(self, player_name: str, player_id: str):
+        if not self.first_player:
+            self.first_player['name'] = player_name
+            self.first_player['ID'] = player_id
         else:
-            self.second_name = player_name
+            self.second_player['name'] = player_name
+            self.second_player['ID'] = player_id
 
     def set_player_id(self, client_id):
         if not self.temporary_id:
             self.temporary_id = client_id
 
     def make_move(self, index: int, client_id):
-        # if self.last_player == client_id:
-        #     return False
+        if self.last_player == client_id:
+            return False
 
         if self.board[index] is None:
             self.board[index] = self.current_player
@@ -106,52 +120,75 @@ game_state = GameState()
 
 @app.get("/")
 async def read_root(request: Request):
-    return templates.TemplateResponse('playerName.html', {"request": request})
+    return templates.TemplateResponse('inputName.html', {"request": request})
 
 @app.get("/game")
 async def read_game(request: Request):
-    return templates.TemplateResponse('index.html', {"request": request})
+    return templates.TemplateResponse('gameLobby.html', {"request": request})
 
-@app.websocket("/ws/user/{user_name}")
-async def websocket_endpoint_user(websocket: WebSocket, user_name: str):
+@app.websocket("/ws/name/{client_id}")
+async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
     await manager.connect(websocket)
-    while True:
-        name = await websocket.receive_text()
-        game_state.set_player_name(name)
-        print(name)
-        print(game_state.first_name)
-        print(game_state.second_name)
-        if (game_state.first_name or game_state.second_name):
+    try:
+        while True:
+            player_data = await websocket.receive_text()
+            parsed_player_data = json.loads(player_data)
+            received_player_name = parsed_player_data[0]
+            received_player_id = parsed_player_data[1]
+            game_state.set_player_data(received_player_name, received_player_id)
+            game_state.set_player_id(client_id)
+            print("client ID name:", client_id)
             await manager.broadcast(json.dumps({
-                "message_type": "player_names",
-                "firstName": game_state.first_name,
-                "secondName": game_state.second_name,
+                "message_type": "player_data",
+                "first_player": game_state.first_player,
+                "second_player": game_state.second_player,
             }))
+        
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        # await manager.broadcast(json.dumps({"message_type": "player_dc"}))
+        # await manager.reset()
+        # game_state.reset()
+
 
 @app.websocket("/ws/lobby/{client_id}")
 async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
     await manager.connect(websocket)
     try:
         while True:
-            data = await websocket.receive_text()
-            array_data = json.loads(data)
-            index = int(array_data[0])
-            received_client_id = array_data[1]
-            game_state.set_player_id(received_client_id)
-
-            if game_state.make_move(index, client_id):
+            # data = client_id
+            # print(data)
+            # print('printing client id')
+            player_index = await websocket.receive_text()
+            player_index = int(player_index)
+            # empty_board = game_state.is_board_empty(game_state.board)
+            
+            await manager.broadcast(json.dumps({
+                "message_type": "player_data",
+                "first_player": game_state.first_player,
+                "second_player": game_state.second_player,
+            }))
+            print(game_state.first_player)
+            print(game_state.second_player)
+            print("client ID lobby:", client_id)
+      
+            if game_state.make_move(player_index, client_id):
                 await manager.broadcast(json.dumps({
                     "message_type": "game_state",
                     "board": game_state.board,
                     "currentPlayer": game_state.current_player,
-                    "playerId": received_client_id,
                     "connectionCount": manager.connection_count,
-                    "playerIndex": index,
+                    "playerID": client_id,
+                    "playerIndex": player_index,
                 }))
+
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         await manager.broadcast(json.dumps({"message_type": "player_dc"}))
         await manager.reset()
         game_state.reset()
+        game_state.first_player = {}
+        game_state.second_player = {}
+
 
 
