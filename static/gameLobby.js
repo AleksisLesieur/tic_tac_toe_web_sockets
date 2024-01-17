@@ -8,11 +8,7 @@ const secondPlayer = document.querySelector('.player2')
 
 const modal = document.querySelector(".modal")
 
-const modalContent = document.querySelector(".modal-content");
-
 const modalText = document.querySelector(".modal-text");
-
-const logout = document.querySelector(".logout")
 
 const playerID = crypto.randomUUID();
 
@@ -112,14 +108,21 @@ socket.onmessage = function (event) {
     modalText.textContent = "Please wait! I'll login shortly";
     return;
   } else if (messageType === "player_data") {
+
     firstPlayer.textContent = receivedData.first_player.name;
     secondPlayer.textContent = receivedData.second_player.name;
-    // if (receivedData.second_player.ID === secondPlayerID) {
-    //   modal.style.display = "block";
-    //   modalText.textContent = "I've just logged in! Thinking of a move";
-    // }
+
+    if (!localStorage.getItem("firstPlayer") && !localStorage.getItem("secondPlayer")) {
+      localStorage.setItem("firstPlayer", receivedData.first_player.name);
+      localStorage.setItem("secondPlayer", receivedData.second_player.name);
+    }
+  
   } else if (messageType === "game_started") {
     modal.style.display = "none"
+    if (receivedData.firstPlayerID === playerID) {
+      modal.style.display = "block";
+      modalText.textContent = "I've just logged in! Thinking of my first move";
+    }
     return;
   } else if (messageType === 'full_room') {
     console.log(messageType, "message type");
@@ -129,7 +132,7 @@ socket.onmessage = function (event) {
     return;
   } else if (messageType === "player_dc") {
     modal.style.display = "block";
-    modalText.textContent = "The other player just disconnected, please refresh your page!";
+    modalText.textContent = "The other player just disconnected, please logout or refresh your page!";
     document.head.appendChild(style);
     return;
   }
@@ -138,6 +141,7 @@ socket.onmessage = function (event) {
     if (playerID === receivedData.clientID) {
       modal.style.display = "block";
       modalText.textContent = "Thinking of a move";
+      modalText.style.textAlign = "center";
     } else {
       modal.style.display = "none";
     }
@@ -166,9 +170,3 @@ boxes.forEach(function (element, index) {
     }
   });
 });
-
-logout.addEventListener('click', function () {
-  localStorage.clear()
-  location.href = "http://localhost:8000";
-  socket.close();
-})

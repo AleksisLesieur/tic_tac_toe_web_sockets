@@ -231,7 +231,8 @@ class ConnectionManager:
 
             if self.connection_count == 2:
                 await self.broadcast(json.dumps({
-                    "message_type": "game_started"
+                    "message_type": "game_started", 
+                    "firstPlayerID": game_state.current_ID
                 }))
 
         else:
@@ -297,8 +298,6 @@ class GameState:
     def reset(self):
         self.board = [None] * 9
         self.current_player = 'X'
-        self.first_player = {}
-        self.second_player = {}
 
 # class GameData:
 #     def __init__(self):
@@ -402,6 +401,7 @@ async def received_names(data: dict):
 @app.websocket('/ws/lobby/{client_id}')
 async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
     await connection_manager.connect(websocket)
+    game_state.set_player_ID(client_id)
     try:
         while True:
             await connection_manager.broadcast(json.dumps({

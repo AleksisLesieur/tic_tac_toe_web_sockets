@@ -80,7 +80,8 @@ main article.board .row .box {
 main article.board .row .box:not(:first-child) {
   border-left: 4px solid black;
 }
-.logout {
+
+.restart {
   margin: 0 auto;
   margin-top: 50px;
   padding: 10px;
