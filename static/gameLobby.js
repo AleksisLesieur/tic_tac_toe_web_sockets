@@ -12,11 +12,19 @@ const modalContent = document.querySelector(".modal-content");
 
 const modalText = document.querySelector(".modal-text");
 
-const clientID = crypto.randomUUID();
+const logout = document.querySelector(".logout")
 
-const socket = new WebSocket(`ws://localhost:8000/ws/lobby/${clientID}`);
+const playerID = crypto.randomUUID();
+
+const socket = new WebSocket(`ws://localhost:8000/ws/lobby/${playerID}`);
 
 const savedBoard = new Array(9).fill(null);
+
+const isSavedBoardEmpty = savedBoard.every(function (element) {
+  return element === null
+})
+
+console.log(isSavedBoardEmpty)
 
 let svgX;
 
@@ -71,70 +79,83 @@ socket.onopen = function (event) {
   console.log("WebSocket connection established");
   console.log(event);
   modal.style.display = "none";
-  updatePlayerNames()
 };
 
 socket.onclose = function (e) {
   console.log("WebSocket connection closed", e);
   modal.style.display = "block";
+  modalText.textContent = "Sorry, the room is currently full!";
   socket.close();
 };
 
 socket.onerror = function (err) {
   console.error("WebSocket error", err);
+  modal.style.display = "block";
+  modalText.textContent = "Sorry, some form of error has occured, please refresh the page!";
   socket.close();
 };
 
+let receivedData;
+
 socket.onmessage = function (event) {
-  console.log("on message event");
-  console.log(event);
 
-  const emptyBoard = savedBoard.every((element) => element === null);
-
-  const localID = localStorage.getItem("playerID");
-
-  const receivedData = JSON.parse(event.data);
+  receivedData = JSON.parse(event.data);
 
   const messageType = JSON.parse(event.data).message_type;
 
+  console.log("received data");
+
   console.log(receivedData);
 
-
-  // if (messageType === "waiting_for_player") {
-  //   // modal.style.display = "block";
-  //   modalText.textContent = "Please wait! I'll login shortly";
-  // }
-  if (messageType === "player_data") {
+  if (messageType === "waiting_for_player") {
+    modal.style.display = "block";
+    modalText.textContent = "Please wait! I'll login shortly";
+    return;
+  } else if (messageType === "player_data") {
     firstPlayer.textContent = receivedData.first_player.name;
     secondPlayer.textContent = receivedData.second_player.name;
-    if (receivedData.second_player.ID === localID) {
-      // modal.style.display = "block";
-      modalText.textContent = "I've just logged in! Thinking of a move";
-    }
-  } else if (messageType === "full_room") {
+    // if (receivedData.second_player.ID === secondPlayerID) {
+    //   modal.style.display = "block";
+    //   modalText.textContent = "I've just logged in! Thinking of a move";
+    // }
+  } else if (messageType === "game_started") {
+    modal.style.display = "none"
+    return;
+  } else if (messageType === 'full_room') {
     console.log(messageType, "message type");
-    // modal.style.display = "block";
+    modal.style.display = "block";
     modalText.textContent = "Sorry, the room is currently full!";
     document.head.appendChild(style);
+    return;
+  } else if (messageType === "player_dc") {
+    modal.style.display = "block";
+    modalText.textContent = "The other player just disconnected, please refresh your page!";
+    document.head.appendChild(style);
+    return;
   }
-
 
   if (messageType === "game_state") {
-    console.log(messageType, "message type");
-    for (let i = 0; i < 9; i++) {
-      const currentSymbol = receivedData["board"][i];
-      let newSVG = "";
-      if (currentSymbol == "X") {
-        newSVG = svgX;
-      } else if (currentSymbol === "O") {
-        newSVG = svgO;
-      }
-      savedBoard[i] = newSVG;
-      if (boxes[i].textContent === "") {
-        boxes[i].innerHTML = savedBoard[i];
+    if (playerID === receivedData.clientID) {
+      modal.style.display = "block";
+      modalText.textContent = "Thinking of a move";
+    } else {
+      modal.style.display = "none";
+    }
+      console.log(messageType, "message type");
+      for (let i = 0; i < 9; i++) {
+        const currentSymbol = receivedData["board"][i];
+        let newSVG = "";
+        if (currentSymbol == "X") {
+          newSVG = svgX;
+        } else if (currentSymbol === "O") {
+          newSVG = svgO;
+        }
+        savedBoard[i] = newSVG;
+        if (boxes[i].textContent === "") {
+          boxes[i].innerHTML = savedBoard[i];
+        }
       }
     }
-  }
 };
 
 boxes.forEach(function (element, index) {
@@ -146,18 +167,8 @@ boxes.forEach(function (element, index) {
   });
 });
 
-
-function updatePlayerNames() {
-  // Fetch player data from the server or update names based on your logic
-  // Example: Fetch player data from a server endpoint
-  fetch(`ws://localhost:8000/ws/lobby/${clientID}`)
-    .then((response) => response.json())
-    .then((data) => {
-      // Assuming your data structure is similar to { first_player: { name: 'Player1' }, second_player: { name: 'Player2' } }
-      firstPlayer.textContent = data.first_player.name;
-      secondPlayer.textContent = data.second_player.name;
-    })
-    .catch((error) => {
-      console.error("Error fetching player data:", error);
-    });
-}
+logout.addEventListener('click', function () {
+  localStorage.clear()
+  location.href = "http://localhost:8000";
+  socket.close();
+})

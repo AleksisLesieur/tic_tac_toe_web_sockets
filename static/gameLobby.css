@@ -12,23 +12,18 @@ header, main {
 header .names {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
-}
-header .names div:nth-child(1), header .scores span:nth-child(1) {
-  color: red;
-}
-header .names div:nth-child(3), header .scores span:nth-child(3) {
-  color: green;
-}
-header .scores {
-  display: flex;
-  justify-content: center;
-}
-header .scores span {
-  padding: 10px;
 }
 
-header div {
+
+header .names span:nth-child(1), header .scores span:nth-child(1) {
+  color: red;
+}
+header .names span:nth-child(3), header .scores span:nth-child(3) {
+  color: green;
+}
+
+
+header span {
   padding: 10px;
 }
 
@@ -85,7 +80,7 @@ main article.board .row .box {
 main article.board .row .box:not(:first-child) {
   border-left: 4px solid black;
 }
-.gameButton {
+.logout {
   margin: 0 auto;
   margin-top: 50px;
   padding: 10px;

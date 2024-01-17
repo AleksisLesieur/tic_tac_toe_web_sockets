@@ -4,19 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic Tac Toe</title>
-    <link rel="stylesheet" href="../static/index.css">
+    <link rel="stylesheet" href="../static/gameLobby.css">
     <link rel="icon" type="image/png" href="/static/tic-tac-toe.png">
 </head>
 <body>
-
-<!--    <div class="nameModal" id="myModal">-->
-<!--        <div class="nameModal-content">-->
-<!--            <div class="greetings">Greetings and welcome!</div>-->
-<!--            <label for="nameInput">You're about to participate in an exciting game of tic-tac-toe with me. The moment you input your name, I'll receive a notification on my app called "ntfy" that someone is waiting for me to join</label>-->
-<!--            <input type="text" id="nameInput" placeholder="Your Name" oninput="toggleButton()">-->
-<!--            <button id="saveButton" onclick="saveName()" disabled>Save</button>-->
-<!--        </div>-->
-<!--    </div>-->
 
     <div class="modal">
         <div class="modal-content">
@@ -27,9 +18,9 @@
 
     <header>
         <div class="names">
-            <div class="player1">?</div>
-            <div>vs</div>
-            <div class="player2">?</div>
+            <span class="player1">?</span>
+            <span class="vs">vs</span>
+            <span class="player2">?</span>
         </div>
         <!-- <div class="scores">
             <span>0</span>
@@ -57,9 +48,11 @@
         </article>
     </main>
 
-    <a href="">
+    <!-- <a href="">
         <button class="gameButton">restart the game</button>
-    </a>
+    </a> -->
+
+    <button class="logout">Log out</button>
 
     <script src="./../static/gameLobby.js"></script>
 
