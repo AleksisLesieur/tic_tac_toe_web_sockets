@@ -28,7 +28,7 @@ nameInput.addEventListener("keypress", function (event) {
 });
 
 saveButton.addEventListener("click", function () {
-  sendingPlayerData();
+  sendingPlayerData()
 });
 
 // function that sends user ID and name to the backend
@@ -74,3 +74,4 @@ async function sendingPlayerData() {
   })
   return response.json()
 }
+

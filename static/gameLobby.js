@@ -10,11 +10,15 @@ const modal = document.querySelector(".modal")
 
 const modalText = document.querySelector(".modal-text");
 
-const playerID = crypto.randomUUID();
+let playerID = crypto.randomUUID();
+
+let temporaryID = ''
 
 const socket = new WebSocket(`ws://localhost:8000/ws/lobby/${playerID}`);
 
 const savedBoard = new Array(9).fill(null);
+
+let savedName = ''
 
 const isSavedBoardEmpty = savedBoard.every(function (element) {
   return element === null
@@ -75,6 +79,11 @@ socket.onopen = function (event) {
   console.log("WebSocket connection established");
   console.log(event);
   modal.style.display = "none";
+  let gettingOldID = event.currentTarget.url
+  let gettingOldID2 = gettingOldID.replace("ws://localhost:8000/ws/lobby/", "");
+  temporaryID = gettingOldID2
+  console.log(gettingOldID2)
+  playerID = gettingOldID2
 };
 
 socket.onclose = function (e) {
@@ -103,19 +112,31 @@ socket.onmessage = function (event) {
 
   console.log(receivedData);
 
+  console.log(playerID, " playerID");
+  console.log(temporaryID, " temporaryID");
+  console.log(receivedData.firstPlayerID, " receivedID");
+
   if (messageType === "waiting_for_player") {
     modal.style.display = "block";
     modalText.textContent = "Please wait! I'll login shortly";
+    // if (!!receivedData.first_player) {
+    //   modalText.textContent = `Some error just occured, you're about to be logged out in 3 seconds!`;
+    //   setTimeout(function () {
+    //     modalText.textContent = `Some error just occured, you're about to be logged out in 2 seconds!`;
+    //   }, 1000);
+    //   setTimeout(function () {
+    //     modalText.textContent = `Some error just occured, you're about to be logged out in 1 seconds!`;
+    //   }, 2000);
+    //   setTimeout(function () {
+    //     modalText.textContent = `Some error just occured, you're about to be logged out in 0 seconds!`;
+    //     location.href = "http://localhost:8000/";
+    //   }, 3000);
+    // }
     return;
   } else if (messageType === "player_data") {
 
     firstPlayer.textContent = receivedData.first_player.name;
     secondPlayer.textContent = receivedData.second_player.name;
-
-    if (!localStorage.getItem("firstPlayer") && !localStorage.getItem("secondPlayer")) {
-      localStorage.setItem("firstPlayer", receivedData.first_player.name);
-      localStorage.setItem("secondPlayer", receivedData.second_player.name);
-    }
   
   } else if (messageType === "game_started") {
     modal.style.display = "none"
@@ -132,7 +153,17 @@ socket.onmessage = function (event) {
     return;
   } else if (messageType === "player_dc") {
     modal.style.display = "block";
-    modalText.textContent = "The other player just disconnected, please logout or refresh your page!";
+    modalText.textContent = `The other player just disconnected, you're about to be logged out in 3 seconds!`;
+    setTimeout(function () {
+      modalText.textContent = `The other player just disconnected, you're about to be logged out in 2 seconds!`;
+    }, 1000)
+    setTimeout(function () {
+      modalText.textContent = `The other player just disconnected, you're about to be logged out in 1 seconds!`;
+    }, 2000);
+    setTimeout(function () {
+      modalText.textContent = `The other player just disconnected, you're about to be logged out in 0 seconds!`;
+      window.location.href = "http://localhost:8000/";
+    }, 3000);
     document.head.appendChild(style);
     return;
   }
@@ -140,15 +171,14 @@ socket.onmessage = function (event) {
   if (messageType === "game_state") {
     if (playerID === receivedData.clientID) {
       modal.style.display = "block";
-      modalText.textContent = "Thinking of a move";
-      modalText.style.textAlign = "center";
+      modalText.textContent = "Thinking of my next move";
     } else {
       modal.style.display = "none";
     }
       console.log(messageType, "message type");
       for (let i = 0; i < 9; i++) {
         const currentSymbol = receivedData["board"][i];
-        let newSVG = "";
+        let newSVG = ''
         if (currentSymbol == "X") {
           newSVG = svgX;
         } else if (currentSymbol === "O") {
@@ -158,9 +188,25 @@ socket.onmessage = function (event) {
         if (boxes[i].textContent === "") {
           boxes[i].innerHTML = savedBoard[i];
         }
-      }
     }
-};
+    // let tieCondition = savedBoard.every(function (element) {
+    //   return typeof element === 'string'
+    // })
+
+    // if (tieCondition) {
+    //     modal.style.display = "block";
+    //     modalText.textContent = "It's a tie! Wanna play again?";
+    //     document.head.appendChild(style);
+    // }
+  }
+  
+   if (messageType === "result") {
+     console.log("trying to find a way to separate both players");
+     console.log(receivedData.result);
+     console.log(receivedData["board"]);
+  }
+}
+  
 
 boxes.forEach(function (element, index) {
   element.addEventListener("click", function () {
@@ -170,3 +216,24 @@ boxes.forEach(function (element, index) {
     }
   });
 });
+
+// window.onbeforeunload = function () {
+//   // The returned string is displayed in the confirmation dialog
+//   modalText.textContent = `You've just refreshed the page, you're about to be logged out in 3 seconds!`;
+//   setTimeout(function () {
+//     modalText.textContent = `You've just refreshed the page, you're about to be logged out in 2 seconds!`;
+//   }, 1000);
+//   setTimeout(function () {
+//     modalText.textContent = `You've just refreshed the page, you're about to be logged out in 1 seconds!`;
+//   }, 2000);
+//   setTimeout(function () {
+//     modalText.textContent = `You've just refreshed the page, you're about to be logged out in 0 seconds!`;
+//   }, 3000);
+//   window.location.href = "http://localhost:8000/";
+// };
+
+// // Handle the page unload event
+// window.addEventListener("unload", function () {
+//   // Redirect to the desired URL
+//   location.href = "http://localhost:8000/";
+// });
