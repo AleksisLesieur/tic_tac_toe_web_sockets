@@ -6,7 +6,7 @@ const saveButton = document.getElementById("saveButton");
 
 let userName = "default";
 
-const clientID = crypto.randomUUID();
+// const clientID = crypto.randomUUID();
 
 // const socket = new WebSocket(`ws://localhost:8000/ws/name/${clientID}`);
 
@@ -68,8 +68,7 @@ async function sendingPlayerData() {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      playerName: userName,
-      playerID: clientID
+      playerName: userName
     })
   })
   return response.json()

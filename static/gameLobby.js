@@ -12,19 +12,9 @@ const modalText = document.querySelector(".modal-text");
 
 let playerID = crypto.randomUUID();
 
-let temporaryID = ''
-
 const socket = new WebSocket(`ws://localhost:8000/ws/lobby/${playerID}`);
 
 const savedBoard = new Array(9).fill(null);
-
-let savedName = ''
-
-const isSavedBoardEmpty = savedBoard.every(function (element) {
-  return element === null
-})
-
-console.log(isSavedBoardEmpty)
 
 let svgX;
 
@@ -46,8 +36,7 @@ style.innerHTML = `
 
 // adding mobile responsiveness to the SVG elements
 
-
-document.addEventListener("DOMContentLoaded", function () {
+function adjustingSVG() {
     if (window.innerWidth >= 900) {
         svgX = `<svg width="150" height="150" viewBox="0 0 100 100">
             <line path class="path" x1="10%" y1="10%" x2="90%" y2="90%" stroke="red" stroke-width="7.5"></line>
@@ -73,17 +62,26 @@ document.addEventListener("DOMContentLoaded", function () {
             <circle id="my-circle" class="fill path3" cx="50%" cy="50%" r="43.333%" fill="none" stroke="green" stroke-width="7.5" stroke-dasharray="565.4867" />
             </svg>`;
     }
-});
+}
+
+function isBoardEmpty() {
+  for (let item of savedBoard) {
+    if (item !== null) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+document.addEventListener("DOMContentLoaded", adjustingSVG);
+
+document.addEventListener('resize', adjustingSVG)
 
 socket.onopen = function (event) {
   console.log("WebSocket connection established");
   console.log(event);
   modal.style.display = "none";
-  let gettingOldID = event.currentTarget.url
-  let gettingOldID2 = gettingOldID.replace("ws://localhost:8000/ws/lobby/", "");
-  temporaryID = gettingOldID2
-  console.log(gettingOldID2)
-  playerID = gettingOldID2
 };
 
 socket.onclose = function (e) {
@@ -113,37 +111,34 @@ socket.onmessage = function (event) {
   console.log(receivedData);
 
   console.log(playerID, " playerID");
-  console.log(temporaryID, " temporaryID");
   console.log(receivedData.firstPlayerID, " receivedID");
 
   if (messageType === "waiting_for_player") {
     modal.style.display = "block";
-    modalText.textContent = "Please wait! I'll login shortly";
-    // if (!!receivedData.first_player) {
-    //   modalText.textContent = `Some error just occured, you're about to be logged out in 3 seconds!`;
-    //   setTimeout(function () {
-    //     modalText.textContent = `Some error just occured, you're about to be logged out in 2 seconds!`;
-    //   }, 1000);
-    //   setTimeout(function () {
-    //     modalText.textContent = `Some error just occured, you're about to be logged out in 1 seconds!`;
-    //   }, 2000);
-    //   setTimeout(function () {
-    //     modalText.textContent = `Some error just occured, you're about to be logged out in 0 seconds!`;
-    //     location.href = "http://localhost:8000/";
-    //   }, 3000);
-    // }
+    if (window.performance.navigation.type === 1) {
+      modalText.textContent = "Please wait! I'll login shortly";
+    }
     return;
   } else if (messageType === "player_data") {
 
     firstPlayer.textContent = receivedData.first_player.name;
     secondPlayer.textContent = receivedData.second_player.name;
-  
-  } else if (messageType === "game_started") {
-    modal.style.display = "none"
-    if (receivedData.firstPlayerID === playerID) {
+    
+    if (receivedData.second_player.ID === playerID && isBoardEmpty()) {
       modal.style.display = "block";
       modalText.textContent = "I've just logged in! Thinking of my first move";
     }
+    // function loadFirstModal(id) {
+    //   if (receivedData.first_player.name === id && isBoardEmpty()) {
+    //     modal.style.display = "block";
+    //     modalText.textContent = "I've just logged in! Thinking of my first move";
+    //   }
+    // }
+
+    // loadFirstModal(playerID)
+
+  } else if (messageType === "game_started") {
+    modal.style.display = "none"
     return;
   } else if (messageType === 'full_room') {
     console.log(messageType, "message type");
@@ -189,15 +184,6 @@ socket.onmessage = function (event) {
           boxes[i].innerHTML = savedBoard[i];
         }
     }
-    // let tieCondition = savedBoard.every(function (element) {
-    //   return typeof element === 'string'
-    // })
-
-    // if (tieCondition) {
-    //     modal.style.display = "block";
-    //     modalText.textContent = "It's a tie! Wanna play again?";
-    //     document.head.appendChild(style);
-    // }
   }
   
    if (messageType === "result") {
@@ -217,23 +203,21 @@ boxes.forEach(function (element, index) {
   });
 });
 
-// window.onbeforeunload = function () {
-//   // The returned string is displayed in the confirmation dialog
-//   modalText.textContent = `You've just refreshed the page, you're about to be logged out in 3 seconds!`;
-//   setTimeout(function () {
-//     modalText.textContent = `You've just refreshed the page, you're about to be logged out in 2 seconds!`;
-//   }, 1000);
-//   setTimeout(function () {
-//     modalText.textContent = `You've just refreshed the page, you're about to be logged out in 1 seconds!`;
-//   }, 2000);
-//   setTimeout(function () {
-//     modalText.textContent = `You've just refreshed the page, you're about to be logged out in 0 seconds!`;
-//   }, 3000);
-//   window.location.href = "http://localhost:8000/";
-// };
+function justInCaseThePageWasRefreshed() {
+  if (window.performance.navigation.type === 1) {
+    modalText.textContent = `You refreshed the page, you're about to be logged out in 3 seconds!`;
+    setTimeout(function () {
+      modalText.textContent = `You refreshed the page, you're about to be logged out in 2 seconds!`;
+    }, 1000);
+    setTimeout(function () {
+      modalText.textContent = `You refreshed the page, you're about to be logged out in 1 seconds!`;
+    }, 2000);
+    setTimeout(function () {
+      modalText.textContent = `You refreshed the page, you're about to be logged out in 0 seconds!`;
+      window.location.href = "http://localhost:8000/";
+    }, 3000);
+    document.head.appendChild(style);
+  }
+}
 
-// // Handle the page unload event
-// window.addEventListener("unload", function () {
-//   // Redirect to the desired URL
-//   location.href = "http://localhost:8000/";
-// });
+justInCaseThePageWasRefreshed()

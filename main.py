@@ -72,28 +72,29 @@ connection_manager = ConnectionManager()
 class GameState:
     def __init__(self):
         self.board = [None] * 9
-        self.current_player = 'O'
+        self.current_player = 'X'
         self.current_ID = None
         self.refreshed_game_ID = None
         self.first_player = {}
         self.second_player = {}
         self.winner = None
     
-    def set_player_names(self, player_name: str, player_id: str):
+    def set_player_names(self, player_name: str):
         if not self.first_player:
             self.first_player['name'] = player_name
-            self.first_player['ID'] = player_id
         else:
             self.second_player['name'] = player_name
-            self.second_player['ID'] = player_id
+
 
     def set_player_ID(self, ID: str):
         if not self.current_ID:
             self.current_ID = ID
             self.refreshed_game_ID = ID
-    
-    def is_board_empty(board):
-        return all(element is None for element in board)
+
+        if len(self.first_player) <= 1:
+            self.first_player['ID'] = ID
+        else:
+            self.second_player['ID'] = ID
 
     def make_move(self, index: int, client_id: str):        
         if self.current_ID == client_id:
@@ -101,11 +102,17 @@ class GameState:
         
         if self.board[index] is None:
             self.board[index] = self.current_player
-            self.current_player = 'X' if self.current_player == 'O' else 'O'
+            self.current_player = 'O' if self.current_player == 'X' else 'X'
             self.current_ID = client_id
             return True
         
         return False
+    
+    def is_board_full(self):
+        for item in self.board:
+            if item is None:
+                return False
+        return True
     
     def check_winner(self, board: list):
         # checking horizontal
@@ -128,6 +135,9 @@ class GameState:
                 self.winner = 'X'
             else:
                 self.winner = 'O'
+
+        if self.is_board_full():
+            self.winner = 'Tie'
 
         return self.winner
     
@@ -153,8 +163,7 @@ async def read_game(request: Request):
 @app.post("/player_data")
 async def received_names(data: dict):
     player_name = data['playerName']
-    player_ID = data['playerID']
-    game_state.set_player_names(player_name, player_ID)
+    game_state.set_player_names(player_name)
     return {"message": [game_state.first_player, game_state.second_player]} 
 
 @app.websocket('/ws/lobby/{client_id}')
@@ -168,10 +177,15 @@ async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
                 "first_player": game_state.first_player,
                 "second_player": game_state.second_player,
             }))
+
             player_index = await websocket.receive_text()
+
             if player_index.isdigit():
+
                 game_coordinates = int(player_index)
+
                 game_state.make_move(game_coordinates, client_id)
+
                 await connection_manager.broadcast(json.dumps({
                     "message_type": "game_state",
                     "board": game_state.board,
@@ -180,15 +194,20 @@ async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
                     "playerIndex": game_coordinates,
                     "clientID": client_id,
                 }))
+
             result = game_state.check_winner(game_state.board)
             await connection_manager.broadcast(json.dumps({
                 "message_type": "result",
                 "result": result,
             }))
+            print(game_state.first_player)
+            print(game_state.second_player)
 
     except WebSocketDisconnect:
         await connection_manager.disconnect(websocket)
-        await connection_manager.broadcast(json.dumps({"message_type": "player_dc"}))
+        await connection_manager.broadcast(json.dumps({
+            "message_type": "player_dc"
+            }))
         await connection_manager.reset()
         game_state.reset_board()
-        # game_state.reset_names()
+        game_state.reset_names()
