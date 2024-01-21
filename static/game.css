@@ -81,7 +81,7 @@ main article.board .row .box:not(:first-child) {
   border-left: 4px solid black;
 }
 
-.restart {
+.logout, .playAgain {
   margin: 0 auto;
   margin-top: 50px;
   padding: 10px;
