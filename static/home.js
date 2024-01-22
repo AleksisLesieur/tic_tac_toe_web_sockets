@@ -32,8 +32,6 @@ async function sendingPlayerData() {
 
   nameModal.style.display = "none";
 
-  window.location.href = "https://tic-tac-toe-pus7t.ondigitalocean.app/game";
-
   const response = await fetch("https://tic-tac-toe-pus7t.ondigitalocean.app/player_data",
     {
       method: "POST",
@@ -45,6 +43,9 @@ async function sendingPlayerData() {
       }),
     }
   );
+
+  window.location.href = "https://tic-tac-toe-pus7t.ondigitalocean.app/game";
+  
   return response.json()
 }
 
