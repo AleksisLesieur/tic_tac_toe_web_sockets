@@ -45,13 +45,8 @@ class ConnectionManager:
                     "playerID": self.players_ID,
                     "playerNames": self.players_names
                 }))
-                await asyncio.sleep(60) 
-                await self.broadcast(json.dumps({
-                    "message_type": "player_busy"
-                }))
-
+                
             if self.connection_count == 2:
-                print('2 players connected thingy')
                 await self.broadcast(json.dumps({
                     "message_type": "game_started", 
                     "firstPlayerID": game_state.refreshed_game_ID,
@@ -123,36 +118,30 @@ class GameState:
         # checking horizontally for X
         if board[0] == 'X' and board[1] == 'X' and board[2] == 'X' or board[3] == 'X' and board[4] == 'X' and board[5] == 'X' or board[6] == 'X' and board[7] == 'X' and board[8] == 'X':
             if board[0] == 'X' or board[3] == 'X' or board[6] == 'X':
-                print('check winner function is run 1')
                 self.winner = 'X'
 
         # checking vertically for X
         if board[0] == 'X' and board[3] == 'X' and board[6] == 'X' or board[1] == 'X' and board[4] == 'X' and board[7] == 'X' or board[2] == 'X' and board[5] == 'X' and board[8] == 'X':
-            print('check winner function is run 2')
             if board[0] == 'X' or board[1] == 'X' or board[2] == 'X':
                 self.winner = 'X'
 
         # checking diagonally for X
         if board[0] == 'X' and board[4] == 'X' and board[8] == 'X' or board[2] == 'X' and board[4] == 'X' and board[6] == 'X':
-            print('check winner function is run 3')
             if board[4] == 'X':
                 self.winner = 'X'
 
         # checking horizontally for O
         if board[0] == 'O' and board[1] == 'O' and board[2] == 'O' or board[3] == 'O' and board[4] == 'O' and board[5] == 'O' or board[6] == 'O' and board[7] == 'O' and board[8] == 'O':
             if board[0] == 'O' or board[3] == 'O' or board[6] == 'O':
-                print('check winner function is run 1')
                 self.winner = 'O'
 
         # checking vertically for O
         if board[0] == 'O' and board[3] == 'O' and board[6] == 'O' or board[1] == 'O' and board[4] == 'O' and board[7] == 'O' or board[2] == 'O' and board[5] == 'O' and board[8] == 'O':
-            print('check winner function is run 2')
             if board[0] == 'O' or board[1] == 'O' or board[2] == 'O':
                 self.winner = 'O'
 
         # checking diagonally for O
         if board[0] == 'O' and board[4] == 'O' and board[8] == 'O' or board[2] == 'O' and board[4] == 'O' and board[6] == 'O':
-            print('check winner function is run 3')
             if board[4] == 'O':
                 self.winner = 'O'
 
@@ -221,8 +210,6 @@ async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
                 }))
 
             else:
-                print(player_index)
-                print(connection_manager.players_ID)
                 game_state.reset_board()
                 if (player_index == connection_manager.players_ID[0]):
                     game_state.current_player = 'O'
@@ -246,4 +233,3 @@ async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
         await connection_manager.broadcast(json.dumps({"message_type": "player_dc"}))
         await connection_manager.reset()
         game_state.reset_board()
-        game_state.reset_names()

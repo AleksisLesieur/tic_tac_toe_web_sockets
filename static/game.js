@@ -14,7 +14,11 @@ const Logout = document.querySelector(".logout")
 
 let playerID = crypto.randomUUID();
 
-const socket = new WebSocket(`ws://localhost:8000/ws/lobby/${playerID}`);
+const url = window.location.href.slice(0, -4);
+
+const socket = new WebSocket(`ws://${window.location.host}/ws/lobby/${playerID}`);
+
+// const socket = new WebSocket(`ws://localhost:8000/ws/lobby/${playerID}`);
 
 const playAgain = document.querySelector(".playAgain");
 
@@ -104,7 +108,7 @@ function playingAgain() {
 playAgain.addEventListener("click", playingAgain);
 
 Logout.addEventListener('click', function () {
-  window.location.href = "http://localhost:8000/";
+  location.href = url;
 })
 
 socket.onopen = function (event) {
@@ -116,14 +120,16 @@ socket.onopen = function (event) {
 socket.onclose = function (e) {
   console.log("WebSocket connection closed", e);
   modal.style.display = "block";
-  modalText.textContent = "Sorry, the room is currently full!";
+  modalText.textContent = "Sorry, some form of error has occured, please try again later!";
+  document.head.appendChild(style)
   socket.close();
 };
 
 socket.onerror = function (err) {
   console.error("WebSocket error", err);
   modal.style.display = "block";
-  modalText.textContent = "Sorry, some form of error has occured, please refresh the page!";
+  modalText.textContent = "Sorry, some form of error has occured, please try again later!";
+  document.head.appendChild(style)
   socket.close();
 };
 
@@ -135,15 +141,19 @@ socket.onmessage = function (event) {
 
   const messageType = JSON.parse(event.data).message_type;
 
-  console.log("received data");
-
-  console.log(receivedData);
-
-  console.log(playerID, " playerID");
-
   if (messageType === "waiting_for_player") {
+
     modal.style.display = "block";
     modalText.textContent = "Please wait! I'll login shortly";
+
+    // if I'm unavailable
+
+    setTimeout(function () {
+      modalText.textContent =
+        "I'm not available to play at this current time. Feel free to give this a try with one of your colleagues. Thanks for understanding!";
+      document.head.appendChild(style);
+    }, 60_000);
+
     return;
   } 
 
@@ -185,7 +195,7 @@ socket.onmessage = function (event) {
     }, 2000);
     setTimeout(function () {
       modalText.textContent = `The other player just disconnected, you're about to be logged out in 0 seconds!`;
-      window.location.href = "http://localhost:8000/";
+      location.href = url;
     }, 3000);
     document.head.appendChild(style);
     return;
@@ -276,12 +286,8 @@ socket.onmessage = function (event) {
       document.head.appendChild(style);
     }
     setTimeout(function () {
-      window.location.href = "http://localhost:8000/";
+      location.href = url;
     }, 5000)
-  }
-  if (messageType === "player_busy") {
-    modalText.textContent = "I'm sorry, I'm currently busy. Feel free to play the game with someone else. Thanks for understanding!";
-    document.head.appendChild(style);
   }
 }
 
@@ -294,15 +300,10 @@ boxes.forEach(function (element, index) {
     console.log('testing things out')
     if (boxes[index].textContent === "") {
       console.log('socket was sent at index ' + index)
-      // savedBoard[index] = newSVG
-      // boxes[index].innerHTML = savedBoard[index]
       socket.send(index.toString());
     }
   });
 });
-
-
-// boxesData()
 
 function justInCaseThePageWasRefreshed() {
   if (window.performance.navigation.type === 1) {
@@ -315,12 +316,11 @@ function justInCaseThePageWasRefreshed() {
     }, 2000);
     setTimeout(function () {
       modalText.textContent = `You refreshed the page, you're about to be logged out in 0 seconds!`;
-      window.location.href = "http://localhost:8000/";
+      location.href = url;
     }, 3000);
     document.head.appendChild(style);
     
   }
 }
-
 
 justInCaseThePageWasRefreshed()

@@ -37,9 +37,9 @@ async function sendingPlayerData() {
     body: `someone with name ${userName} just joined!`,
   });
 
-  location.href = "http://localhost:8000/game";
+  location.href = `${window.location.href}game`;
 
-  const response = await fetch('http://localhost:8000/player_data', {
+  const response = await fetch(`${window.location.href}player_data`, {
     method: "POST", 
     headers: {
       "Content-Type": "application/json"
