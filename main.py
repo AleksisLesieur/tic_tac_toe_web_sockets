@@ -162,7 +162,7 @@ class GameState:
     def reset_board(self):
         self.board = [None] * 9
         self.winner = None
-        self.current_ID = None
+        # self.current_ID = None
 
 game_state = GameState()
 
