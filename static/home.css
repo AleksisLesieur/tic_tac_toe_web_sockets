@@ -5,7 +5,7 @@ body {
 
 body.modal-open {
     z-index: 5000;
-    overflow: hidden; /* Prevent scrolling */
+    overflow: hidden;
 }
 
 .greetings, label{
@@ -38,7 +38,7 @@ input::placeholder {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #fff;
-    padding: 100px 40px; /* Increased padding for a bigger nameModal */
+    padding: 100px 40px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -46,7 +46,6 @@ input::placeholder {
 
 .greetings {
     font-weight: bold;
-    /*font-size: 1.2em;*/
     text-align: center;
     margin-bottom: 20px;
 }
@@ -75,11 +74,10 @@ input {
 }
 
 #saveButton:disabled {
-    background-color: #ccc; /* Set a different background color for disabled state */
-    cursor: default; /* Set cursor to default for the disabled state */
+    background-color: #ccc;
+    cursor: default;
 }
 
 .opacity {
     opacity: 0;
 }
-

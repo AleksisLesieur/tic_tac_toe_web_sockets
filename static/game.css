@@ -4,16 +4,14 @@
   padding: 0;
 }
 
-
 header, main {
   z-index: 0;
 }
 
-header .names {
+header .names, .scores {
   display: flex;
   justify-content: center;
 }
-
 
 header .names span:nth-child(1), header .scores span:nth-child(1) {
   color: red;
@@ -21,7 +19,6 @@ header .names span:nth-child(1), header .scores span:nth-child(1) {
 header .names span:nth-child(3), header .scores span:nth-child(3) {
   color: green;
 }
-
 
 header span {
   padding: 10px;
@@ -83,7 +80,7 @@ main article.board .row .box:not(:first-child) {
 
 .logout, .playAgain {
   margin: 0 auto;
-  margin-top: 50px;
+  margin-top: 75px;
   padding: 10px;
   display: flex;
   justify-content: center;
@@ -107,26 +104,22 @@ a:link {
   cursor: pointer;
 }
 
-/* bandau modal stuff */
-
-/* Add these styles */
-
 .modal {
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
+    position: fixed; 
+    z-index: 1; 
     left: 0;
     top: 0;
-    width: 100vw; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    width: 100vw;
+    height: 100%; 
+    overflow: auto;
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4);
     display: block;
 }
 
 .modal-content {
     background-color: #fefefe;
-    margin: 10% auto; /* 15% from the top and centered */
+    margin: 300px auto 0 auto;
     max-width: 1355px;
     padding: 50px 20px;
     width: 90%;
@@ -155,14 +148,16 @@ a:link {
 }
 
 svg {
-      width: auto;
-      height: auto;
-    }
+  width: auto;
+  height: auto;
+}
+
 .path, .path2, .path3  {
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
   animation: dash 1s linear forwards;
 }
+
  .path2 {
   animation-delay: 0.5s;
 }
@@ -174,85 +169,90 @@ svg {
 }
 
 body {
-            font-family: Arial, sans-serif;
-    position: relative;
-        }
+  font-family: Arial, sans-serif;
+  position: relative;
+}
 body.modal-open {
-            z-index: 5000;
-            overflow: hidden; /* Prevent scrolling */
-        }
+    z-index: 5000;
+    overflow: hidden;
+}
 
-        .greetings, label{
-            font-size: 2em;
-        }
+.greetings, label{
+    font-size: 2em;
+}
 
-        input, #saveButton {
-            font-size: 1.5em;
-        }
+input, #saveButton {
+    font-size: 1.5em;
+}
 
-        input::placeholder {
-            font-size: 1.2em;
-        }
+input::placeholder {
+    font-size: 1.2em;
+}
 
-        .nameModal {
-            overflow: hidden;
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 9999;
-        }
+.nameModal {
+    overflow: hidden;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+}
 
-        .nameModal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #fff;
-            padding: 100px 40px; /* Increased padding for a bigger nameModal */
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-        }
+.nameModal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 100px 40px; 
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
 
-        .greetings {
-            font-weight: bold;
-            /*font-size: 1.2em;*/
-            text-align: center;
-            margin-bottom: 20px;
-        }
+.greetings {
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-        label {
-            align-self: flex-start;
-            margin-bottom: 20px;
-            line-height: 1.5;
-            text-align: justify;
-        }
+label {
+    align-self: flex-start;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    text-align: justify;
+}
 
-        input {
-            width: 100%;
-            margin-bottom: 20px;
-            padding: 8px;
-            box-sizing: border-box;
-        }
+input {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 8px;
+    box-sizing: border-box;
+}
 
-        #saveButton {
-            width: 100%;
-            padding: 10px;
-            background-color: #4caf50;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
+#saveButton {
+    width: 100%;
+    padding: 10px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
 
-        #saveButton:disabled {
-            background-color: #ccc; /* Set a different background color for disabled state */
-            cursor: default; /* Set cursor to default for the disabled state */
-        }
+#saveButton:disabled {
+    background-color: #ccc;
+    cursor: default;
+}
 
-        .opacity {
-            opacity: 0;
-        }
+.opacity {
+    opacity: 0;
+}
+
+@media only screen and (max-width: 600px) {
+  .modal-content {
+    margin-top: 150px !important;
+  }
+}

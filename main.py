@@ -28,14 +28,6 @@ class ConnectionManager:
     def setting_ID(self, ID: str):
         self.players_ID.append(ID)
 
-    # def sending_data(self, websocket: WebSocket):
-    #     # if len(self.players_ID) == 2 and len(self.players_names) == 2:
-    #     websocket.send_text(json.dumps({
-    #         "message_type": "forcefully_sending_data",
-    #         "playerIDS": self.players_ID,
-    #         "playerNames": self.players_names
-    #     }))
-
     def set_player_names(self, name: str):
         self.players_names.append(name)
     
@@ -64,9 +56,12 @@ class ConnectionManager:
                     "playerID": self.players_ID,
                     "playerNames": self.players_names
                 }))
-                # await websocket.send_text(json.dumps({
-                #     "message_type": "game_started"
-                # }))
+
+            if self.connection_count > len(self.players_names):
+                await self.broadcast(json.dumps({
+                    "message_type": "hacker",
+                    "clientID": self.players_ID
+                }))
 
         else:
             await websocket.send_text(json.dumps({
@@ -97,21 +92,10 @@ class GameState:
         self.current_player = 'X'
         self.current_ID = None
         self.refreshed_game_ID = None
-        # self.first_player = {}
-        # self.second_player = {}
+        self.play_again = 0
+        self.first_score = 0
+        self.second_score = 0
         self.winner = None
-        # self.players_data = []
-
-        # def set_player_names(self, player_name: str):
-        #     self.players_data.append(player_name)
-
-    # def set_player_ID(self, ID: str):
-    #     if not self.current_ID:
-    #         self.current_ID = ID
-    #         self.refreshed_game_ID = ID
-
-    #     self.players_data.append(ID)
-
 
     def make_move(self, index: int, client_id: str):        
         if self.current_ID == client_id:
@@ -173,18 +157,18 @@ class GameState:
 
         return self.winner
     
+    def update_scores(self):
+        if self.winner == 'X':
+            self.first_score += 1
+            
+        if self.winner == 'O':
+            self.second_score += 1
+    
     def reset_board(self):
         self.board = [None] * 9
-        self.current_player = 'X'
         self.winner = None
+        self.current_ID = None
 
-    def reset_names(self):
-        # self.first_player = {}
-        # self.second_player = {}
-        # self.players_data = []
-        # self.pl
-        pass
-        
 game_state = GameState()
 
 @app.get("/")
@@ -205,53 +189,53 @@ async def received_names(data: dict):
 async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
     await connection_manager.connect(websocket)
     connection_manager.setting_ID(client_id)
-    print(connection_manager.players_ID, ' line 188')
-    print(connection_manager.players_names, ' line 189')
-    print('before try thingy')
-    # connection_manager.sending_data()
     try:
         while True:
-            print('after try thingy')
-
-            # game_state.set_player_ID(client_id)
-
             player_index = await websocket.receive_text()
 
-            # if player_index.isdigit():
+            if player_index.isdigit():
 
-            game_coordinates = int(player_index)
+                game_coordinates = int(player_index)
 
-            game_state.make_move(game_coordinates, client_id)
+                game_state.make_move(game_coordinates, client_id)
 
-            result = game_state.check_winner(game_state.board)
+                result = game_state.check_winner(game_state.board)
 
-            await connection_manager.broadcast(json.dumps({
-                "message_type": "player_data",
-                "board": game_state.board,
-                "currentPlayer": game_state.current_player,
-                "connectionCount": connection_manager.connection_count,
-                "playerIndex": game_coordinates,
-                "clientID": client_id,
-                "playerNames": connection_manager.players_names,
-                "playerIDs": connection_manager.players_ID,
-                "result": result
-            }))
+                game_state.update_scores()
 
+                await connection_manager.broadcast(json.dumps({
+                    "message_type": "player_data",
+                    "board": game_state.board,
+                    "currentPlayer": game_state.current_player,
+                    "connectionCount": connection_manager.connection_count,
+                    "playerIndex": game_coordinates,
+                    "clientID": client_id,
+                    "playerNames": connection_manager.players_names,
+                    "playerIDs": connection_manager.players_ID,
+                    "result": result,
+                    "score": [game_state.first_score, game_state.second_score]
+                }))
 
-            # await connection_manager.broadcast(json.dumps({
-            #     "message_type": "game_state",
-            #     "board": game_state.board,
-            #     "currentPlayer": game_state.current_player,
-            #     "connectionCount": connection_manager.connection_count,
-            #     "playerIndex": game_coordinates,
-            #     "clientID": client_id,
-            # }))
-
-            # result = game_state.check_winner(game_state.board)
-            # await connection_manager.broadcast(json.dumps({
-            #     "message_type": "result",
-            #     "result": result,
-            # }))
+            else:
+                print(player_index)
+                print(connection_manager.players_ID)
+                game_state.reset_board()
+                if (player_index == connection_manager.players_ID[0]):
+                    game_state.current_player = 'O'
+                elif (player_index == connection_manager.players_ID[1]):
+                    game_state.current_player = 'X'
+                game_state.play_again += 1
+                if game_state.play_again == 1:
+                    await connection_manager.broadcast(json.dumps({
+                        "message_type": "waiting_to_play_again",
+                    }))
+                if game_state.play_again == 2:
+                    await connection_manager.broadcast(json.dumps({
+                        "message_type": "ready_to_play",
+                        "clientID": client_id,
+                    }))
+                    game_state.play_again = 0
+                
 
     except WebSocketDisconnect:
         await connection_manager.disconnect(websocket)

@@ -18,7 +18,11 @@ const socket = new WebSocket(`ws://localhost:8000/ws/lobby/${playerID}`);
 
 const playAgain = document.querySelector(".playAgain");
 
-const savedBoard = new Array(9).fill(null);
+const firstScore = document.querySelector('.firstScore')
+
+const secondScore = document.querySelector(".secondScore");
+
+let savedBoard = new Array(9).fill(null);
 
 let svgX = `<svg width="150" height="150" viewBox="0 0 100 100">
             <line path class="path" x1="10%" y1="10%" x2="90%" y2="90%" stroke="red" stroke-width="7.5"></line>
@@ -72,6 +76,10 @@ function adjustingSVG() {
     }
 }
 
+document.addEventListener("DOMContentLoaded", adjustingSVG);
+
+window.addEventListener("resize", adjustingSVG);
+
 let newSVG = svgX
 
 function isBoardEmpty() {
@@ -83,13 +91,21 @@ function isBoardEmpty() {
   return true;
 }
 
+function playingAgain() {
+  for (const box of boxes) {
+    box.innerHTML = "";
+  }
+  savedBoard = new Array(9).fill(null);
+  modal.style.display = "none";
+  socket.send(playerID);
+  playAgain.disabled = true
+}
+
+playAgain.addEventListener("click", playingAgain);
+
 Logout.addEventListener('click', function () {
   window.location.href = "http://localhost:8000/";
 })
-
-document.addEventListener("DOMContentLoaded", adjustingSVG);
-
-document.addEventListener('resize', adjustingSVG)
 
 socket.onopen = function (event) {
   console.log("WebSocket connection established");
@@ -124,28 +140,12 @@ socket.onmessage = function (event) {
   console.log(receivedData);
 
   console.log(playerID, " playerID");
-  // console.log(receivedData.firstPlayerID, " receivedID");
 
   if (messageType === "waiting_for_player") {
     modal.style.display = "block";
-    if (window.performance.navigation.type === 1) {
-      modalText.textContent = "Please wait! I'll login shortly";
-    }
+    modalText.textContent = "Please wait! I'll login shortly";
     return;
   } 
-    
-    // if (receivedData.second_player.ID === playerID && isBoardEmpty()) {
-    //   modal.style.display = "block";
-    //   modalText.textContent = "I've just logged in! Thinking of my first move";
-    // }
-    // function loadFirstModal(id) {
-    //   if (receivedData.first_player.name === id && isBoardEmpty()) {
-    //     modal.style.display = "block";
-    //     modalText.textContent = "I've just logged in! Thinking of my first move";
-    //   }
-    // }
-
-    // loadFirstModal(playerID)
 
   else if (messageType === "game_started") {
     firstPlayer.textContent = receivedData.playerNames[0];
@@ -192,16 +192,16 @@ socket.onmessage = function (event) {
   }
 
   if (messageType === "player_data") {
+
     firstPlayer.textContent = receivedData.playerNames[0];
     secondPlayer.textContent = receivedData.playerNames[1];
+
     if (playerID === receivedData.clientID) {
       modal.style.display = "block";
       modalText.textContent = "Thinking of my next move";
     } else {
       modal.style.display = "none";
     }
-
-    // const board = receivedData.board;
 
     if (receivedData.currentPlayer === "X") {
       newSVG = svgX;
@@ -222,33 +222,62 @@ socket.onmessage = function (event) {
     }
 
     if (receivedData.result !== null) {
+      firstScore.textContent = receivedData.score[0];
+      secondScore.textContent = receivedData.score[1];
       if (receivedData.result === 'Tie') {
         modal.style.display = 'block'
-        modalText.textContent = "It's a tie! Please logout to play again!"
+        modalText.textContent = "It's a tie! Wanna play again?"
       }
       if (receivedData.result === "X") {
         if (playerID === receivedData.playerIDs[0]) {
           modal.style.display = "block";
-          modalText.textContent = "You've won! Congrats!";
+          modalText.textContent = "You've won! Congrats! Wanna play again?";
         }
         if (playerID === receivedData.playerIDs[1]) {
           modal.style.display = "block";
-          modalText.textContent = "You've lost :( wanna play again?";
+          modalText.textContent = "You've lost :( Wanna play again?";
         }
       }
       if (receivedData.result === "O") {
         if (playerID === receivedData.playerIDs[1]) {
           modal.style.display = "block";
-          modalText.textContent = "You've won! Congrats!";
+          modalText.textContent = "You've won! Congrats! Wanna play again?";
         }
         if (playerID === receivedData.playerIDs[0]) {
           modal.style.display = "block";
-          modalText.textContent = "You've lost :( wanna play again?";
+          modalText.textContent = "You've lost :( Wanna play again?";
         }
       }
       document.head.appendChild(style);
       playAgain.disabled = false;
     }
+  }
+  if (messageType === "waiting_to_play_again") {
+    modal.style.display = "block";
+    modalText.textContent = "Waiting for both players to confirm";
+    document.head.removeChild(style);
+  }
+  if (messageType === "ready_to_play") {
+    if (playerID === receivedData.clientID) {
+      modal.style.display = "block"
+      modalText.textContent = "Both players confirmed! Thinking of the first move"
+    } else {
+      modal.style.display = "none"
+    }
+  }
+  if (messageType === "hacker") {
+    if (receivedData.clientID[0] === playerID) {
+      modal.style.display = "block";
+      modalText.textContent = "The other player decided to bypass the name, you're about to be redirected to the home page"
+      document.head.appendChild(style);
+    } else {
+      modal.style.display = "block";
+      modalText.textContent = "Sorry, you can't play unless you've written your name, you're about to be redirected to the home page";
+      document.head.appendChild(style);
+    }
+    setTimeout(function () {
+      window.location.href = "http://localhost:8000/";
+    }, 5000)
   }
 }
 
@@ -267,12 +296,6 @@ boxes.forEach(function (element, index) {
     }
   });
 });
-
-playAgain.addEventListener('click', function () {
-  for (const box of boxes) {
-    box.innerHTML = ''
-  }
-})
 
 
 // boxesData()

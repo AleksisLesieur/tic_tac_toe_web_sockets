@@ -6,10 +6,6 @@ const saveButton = document.getElementById("saveButton");
 
 let userName = "default";
 
-// const clientID = crypto.randomUUID();
-
-// const socket = new WebSocket(`ws://localhost:8000/ws/name/${clientID}`);
-
 document.addEventListener("DOMContentLoaded", function () {
     nameInput.focus();
 })
@@ -43,9 +39,6 @@ async function sendingPlayerData() {
 
   location.href = "http://localhost:8000/game";
 
-  // localStorage.setItem('playerName', userName)
-  // localStorage.setItem('playerID', clientID)
-  
   const response = await fetch('http://localhost:8000/player_data', {
     method: "POST", 
     headers: {
