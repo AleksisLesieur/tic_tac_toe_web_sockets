@@ -31,23 +31,25 @@ saveButton.addEventListener("click", function () {
 async function sendingPlayerData() {
 
   nameModal.style.display = "none";
-  
+
+  window.location.href = "https://tic-tac-toe-pus7t.ondigitalocean.app/game";
+
   fetch("https://ntfy.sh/tic_tac_toe", {
     method: "POST", // PUT works too
     body: `someone with name ${userName} just joined!`,
   });
 
-  location.href = "https://tic-tac-toe-pus7t.ondigitalocean.app/game";
-
-  const response = await fetch(`${window.location.href}player_data`, {
-    method: "POST", 
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      playerName: userName
-    })
-  })
+  const response = await fetch("https://tic-tac-toe-pus7t.ondigitalocean.app/player_data",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        playerName: userName,
+      }),
+    }
+  );
   return response.json()
 }
 
