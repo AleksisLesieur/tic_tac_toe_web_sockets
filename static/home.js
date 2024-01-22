@@ -31,6 +31,11 @@ saveButton.addEventListener("click", function () {
 async function sendingPlayerData() {
   nameModal.style.display = "none";
 
+  fetch("https://ntfy.sh/tic_tac_toe", {
+    method: "POST", // PUT works too
+    body: `Somebody with the name ${userName} wants to play!`,
+  });
+
   const response = await fetch("https://tic-tac-toe-pus7t.ondigitalocean.app/player_data",
     {
       method: "POST",
