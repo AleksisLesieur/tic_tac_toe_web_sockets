@@ -82,6 +82,7 @@ class ConnectionManager:
         self.connection_count = 0
         self.players_ID = []
         self.players_names = []
+        game_state.current_ID = None
         game_state.first_score = 0
         game_state.second_score = 0
 
@@ -162,7 +163,7 @@ class GameState:
     def reset_board(self):
         self.board = [None] * 9
         self.winner = None
-        # self.current_ID = None
+        self.current_ID = None
 
 game_state = GameState()
 
