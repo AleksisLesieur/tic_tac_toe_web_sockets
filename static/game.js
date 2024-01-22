@@ -16,7 +16,7 @@ let playerID = crypto.randomUUID();
 
 const url = "https://tic-tac-toe-pus7t.ondigitalocean.app/";
 
-const socket = new WebSocket(`ws://${window.location.host}/ws/lobby/${playerID}`);
+const socket = new WebSocket(`wss://${window.location.host}/ws/lobby/${playerID}`);
 
 const playAgain = document.querySelector(".playAgain");
 
