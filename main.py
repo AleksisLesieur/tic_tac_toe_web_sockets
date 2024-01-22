@@ -99,8 +99,8 @@ class GameState:
         self.winner = None
 
     def make_move(self, index: int, client_id: str):        
-        # if self.current_ID == client_id:
-        #     return False
+        if self.current_ID == client_id:
+            return False
         
         if self.board[index] is None:
             self.board[index] = self.current_player
