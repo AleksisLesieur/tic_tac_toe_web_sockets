@@ -163,7 +163,6 @@ class GameState:
         self.board = [None] * 9
         self.winner = None
         self.current_ID = None
-        self.play_again = 0
 
 game_state = GameState()
 

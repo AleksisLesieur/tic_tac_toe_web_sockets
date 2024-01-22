@@ -251,7 +251,6 @@ socket.onmessage = function (event) {
     modal.style.display = "block";
     modalText.textContent = "Waiting for both players to confirm";
     document.head.removeChild(style);
-    return;
   }
   if (messageType === "ready_to_play") {
     if (playerID === receivedData.clientID) {
