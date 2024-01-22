@@ -109,18 +109,18 @@ Logout.addEventListener('click', function () {
   location.href = url;
 })
 
-socket.onopen = function (event) {
+socket.onopen = function () {
   modal.style.display = "none";
 };
 
-socket.onclose = function (e) {
+socket.onclose = function () {
   modal.style.display = "block";
   modalText.textContent = "Sorry, some form of error has occured, please try again later!";
   document.head.appendChild(style)
   socket.close();
 };
 
-socket.onerror = function (err) {
+socket.onerror = function () {
   modal.style.display = "block";
   modalText.textContent = "Sorry, some form of error has occured, please try again later!";
   document.head.appendChild(style)
@@ -139,14 +139,6 @@ socket.onmessage = function (event) {
 
     modal.style.display = "block";
     modalText.textContent = "Please wait! I'll login shortly";
-
-    // if I'm unavailable
-
-    setTimeout(function () {
-      modalText.textContent =
-        "I'm not available to play at this current time. Feel free to give this a try with one of your colleagues. Thanks for understanding!";
-      document.head.appendChild(style);
-    }, 60_000);
 
     return;
   } 
@@ -259,6 +251,7 @@ socket.onmessage = function (event) {
     modal.style.display = "block";
     modalText.textContent = "Waiting for both players to confirm";
     document.head.removeChild(style);
+    return;
   }
   if (messageType === "ready_to_play") {
     if (playerID === receivedData.clientID) {

@@ -82,13 +82,15 @@ class ConnectionManager:
         self.connection_count = 0
         self.players_ID = []
         self.players_names = []
+        game_state.first_score = 0
+        game_state.second_score = 0
 
 connection_manager = ConnectionManager()
 
 class GameState:
     def __init__(self):
         self.board = [None] * 9
-        self.current_player = 'X'
+        self.current_player = None
         self.current_ID = None
         self.refreshed_game_ID = None
         self.play_again = 0
@@ -102,7 +104,7 @@ class GameState:
         
         if self.board[index] is None:
             self.board[index] = self.current_player
-            self.current_player = 'O' if self.current_player == 'X' else 'X'
+            self.current_player = 'X' if self.current_player == 'O' or None else 'O'
             self.current_ID = client_id
             return True
         
@@ -161,8 +163,7 @@ class GameState:
         self.board = [None] * 9
         self.winner = None
         self.current_ID = None
-        self.first_score = 0
-        self.second_score = 0
+        self.play_again = 0
 
 game_state = GameState()
 
@@ -227,7 +228,6 @@ async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
                         "message_type": "ready_to_play",
                         "clientID": client_id,
                     }))
-                    game_state.play_again = 0
                 
 
     except WebSocketDisconnect:
