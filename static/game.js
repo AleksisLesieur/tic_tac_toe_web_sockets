@@ -110,13 +110,10 @@ Logout.addEventListener('click', function () {
 })
 
 socket.onopen = function (event) {
-  console.log("WebSocket connection established");
-  console.log(event);
   modal.style.display = "none";
 };
 
 socket.onclose = function (e) {
-  console.log("WebSocket connection closed", e);
   modal.style.display = "block";
   modalText.textContent = "Sorry, some form of error has occured, please try again later!";
   document.head.appendChild(style)
@@ -124,7 +121,6 @@ socket.onclose = function (e) {
 };
 
 socket.onerror = function (err) {
-  console.error("WebSocket error", err);
   modal.style.display = "block";
   modalText.textContent = "Sorry, some form of error has occured, please try again later!";
   document.head.appendChild(style)
@@ -178,7 +174,6 @@ socket.onmessage = function (event) {
     }
   }
   else if (messageType === 'full_room') {
-    console.log(messageType, "message type");
     modal.style.display = "block";
     modalText.textContent = "Sorry, the room is currently full!";
     document.head.appendChild(style);
@@ -289,15 +284,9 @@ socket.onmessage = function (event) {
   }
 }
 
-
-
 boxes.forEach(function (element, index) {
-  console.log("Attaching listener to box #" + index, element);
   element.addEventListener("click", function () {
-    console.log(element)
-    console.log('testing things out')
     if (boxes[index].textContent === "") {
-      console.log('socket was sent at index ' + index)
       socket.send(index.toString());
     }
   });
