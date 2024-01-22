@@ -18,7 +18,6 @@ const url = window.location.href.slice(0, -4);
 
 const socket = new WebSocket(`ws://${window.location.host}/ws/lobby/${playerID}`);
 
-// const socket = new WebSocket(`ws://localhost:8000/ws/lobby/${playerID}`);
 
 const playAgain = document.querySelector(".playAgain");
 
