@@ -31,15 +31,17 @@ saveButton.addEventListener("click", function () {
 async function sendingPlayerData() {
   nameModal.style.display = "none";
 
-  const response = await fetch("http://localhost:8000/player_data", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      playerName: userName,
-    }),
-  });
+  const response = await fetch("https://tic-tac-toe-pus7t.ondigitalocean.app/player_data",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        playerName: userName,
+      }),
+    }
+  );
 
   if (response.ok) {
     window.location.href = "https://tic-tac-toe-pus7t.ondigitalocean.app/game";
