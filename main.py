@@ -99,8 +99,8 @@ class GameState:
         self.winner = None
 
     def make_move(self, index: int, client_id: str):        
-        if self.current_ID == client_id:
-            return False
+        # if self.current_ID == client_id:
+        #     return False
         
         if self.board[index] is None:
             self.board[index] = self.current_player
@@ -228,6 +228,7 @@ async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
                         "message_type": "ready_to_play",
                         "clientID": client_id,
                     }))
+                    game_state.play_again = 0
                 
 
     except WebSocketDisconnect:
