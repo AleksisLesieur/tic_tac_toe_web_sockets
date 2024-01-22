@@ -14,10 +14,9 @@ const Logout = document.querySelector(".logout")
 
 let playerID = crypto.randomUUID();
 
-const url = window.location.href.slice(0, -4);
+const url = "https://tic-tac-toe-pus7t.ondigitalocean.app/";
 
 const socket = new WebSocket(`ws://${window.location.host}/ws/lobby/${playerID}`);
-
 
 const playAgain = document.querySelector(".playAgain");
 

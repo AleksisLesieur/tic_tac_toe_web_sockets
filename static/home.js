@@ -37,7 +37,7 @@ async function sendingPlayerData() {
     body: `someone with name ${userName} just joined!`,
   });
 
-  location.href = `${window.location.href}game`;
+  location.href = "https://tic-tac-toe-pus7t.ondigitalocean.app/game";
 
   const response = await fetch(`${window.location.href}player_data`, {
     method: "POST", 
