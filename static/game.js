@@ -279,6 +279,10 @@ socket.onmessage = function (event) {
       window.location.href = "http://localhost:8000/";
     }, 5000)
   }
+  if (messageType === "player_busy") {
+    modalText.textContent = "I'm sorry, I'm currently busy. Feel free to play the game with someone else. Thanks for understanding!";
+    document.head.appendChild(style);
+  }
 }
 
 

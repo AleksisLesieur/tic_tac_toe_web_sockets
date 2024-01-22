@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-import json
+import json, asyncio
 
 app = FastAPI()
 
@@ -44,6 +44,10 @@ class ConnectionManager:
                     "message_type": "waiting_for_player",
                     "playerID": self.players_ID,
                     "playerNames": self.players_names
+                }))
+                await asyncio.sleep(60) 
+                await self.broadcast(json.dumps({
+                    "message_type": "player_busy"
                 }))
 
             if self.connection_count == 2:
