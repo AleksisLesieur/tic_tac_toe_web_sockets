@@ -229,7 +229,7 @@ async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
                         "message_type": "ready_to_play",
                         "clientID": client_id,
                     }))
-                    game_state.play_again = set()
+                    game_state.play_again.clear()
                 
 
     except WebSocketDisconnect:
