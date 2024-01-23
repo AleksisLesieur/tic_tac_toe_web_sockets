@@ -24,6 +24,7 @@ class ConnectionManager:
         self.connection_count = 0
         self.players_ID = []
         self.players_names = []
+        self.play_again = set()
 
     def setting_ID(self, ID: str):
         self.players_ID.append(ID)
@@ -85,6 +86,7 @@ class ConnectionManager:
         game_state.current_ID = None
         game_state.first_score = 0
         game_state.second_score = 0
+        self.play_again.clear()
 
 connection_manager = ConnectionManager()
 
@@ -94,7 +96,6 @@ class GameState:
         self.current_player = None
         self.current_ID = None
         self.refreshed_game_ID = None
-        self.play_again = set()
         self.first_score = 0
         self.second_score = 0
         self.winner = None
@@ -165,6 +166,7 @@ class GameState:
         self.winner = None
         self.current_ID = None
         self.current_player = None
+    
 
 game_state = GameState()
 
