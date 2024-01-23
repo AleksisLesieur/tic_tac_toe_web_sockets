@@ -104,8 +104,8 @@ class GameState:
             return False
         
         if self.board[index] is None:
-            self.board[index] = self.current_player
             self.current_player = 'X' if self.current_player == 'O' or None else 'O'
+            self.board[index] = self.current_player
             self.current_ID = client_id
             return True
         
