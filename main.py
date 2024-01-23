@@ -215,9 +215,9 @@ async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
 
             else:
                 game_state.reset_board()
-                if (player_index == connection_manager.players_ID[0]):
+                if (player_index == connection_manager.players_ID[1]):
                     game_state.current_player = 'O'
-                elif (player_index == connection_manager.players_ID[1]):
+                elif (player_index == connection_manager.players_ID[0]):
                     game_state.current_player = 'X'
                 game_state.play_again.add(player_index)
                 if len(game_state.play_again) == 1:
