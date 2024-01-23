@@ -94,7 +94,7 @@ class GameState:
         self.current_player = None
         self.current_ID = None
         self.refreshed_game_ID = None
-        self.play_again = 0
+        self.play_again = set()
         self.first_score = 0
         self.second_score = 0
         self.winner = None
@@ -164,6 +164,7 @@ class GameState:
         self.board = [None] * 9
         self.winner = None
         self.current_ID = None
+        self.current_player = None
 
 game_state = GameState()
 
@@ -218,17 +219,17 @@ async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
                     game_state.current_player = 'O'
                 elif (player_index == connection_manager.players_ID[1]):
                     game_state.current_player = 'X'
-                game_state.play_again += 1
-                if game_state.play_again == 1:
+                game_state.play_again.add(player_index)
+                if len(game_state.play_again) == 1:
                     await connection_manager.broadcast(json.dumps({
                         "message_type": "waiting_to_play_again",
                     }))
-                if game_state.play_again == 2:
+                if len(game_state.play_again) == 2:
                     await connection_manager.broadcast(json.dumps({
                         "message_type": "ready_to_play",
                         "clientID": client_id,
                     }))
-                    game_state.play_again = 0
+                    game_state.play_again = set()
                 
 
     except WebSocketDisconnect:

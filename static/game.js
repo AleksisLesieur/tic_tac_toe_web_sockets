@@ -98,9 +98,9 @@ function playingAgain() {
     box.innerHTML = "";
   }
   savedBoard = new Array(9).fill(null);
-  modal.style.display = "none";
-  socket.send(playerID);
+  // modal.style.display = "none";
   playAgain.disabled = true
+  socket.send(playerID);
 }
 
 playAgain.addEventListener("click", playingAgain);
@@ -251,6 +251,7 @@ socket.onmessage = function (event) {
     modal.style.display = "block";
     modalText.textContent = "Waiting for both players to confirm";
     document.head.removeChild(style);
+    return;
   }
   if (messageType === "ready_to_play") {
     if (playerID === receivedData.clientID) {
@@ -259,6 +260,7 @@ socket.onmessage = function (event) {
     } else {
       modal.style.display = "none"
     }
+    return;
   }
   if (messageType === "hacker") {
     if (receivedData.clientID[0] === playerID) {
