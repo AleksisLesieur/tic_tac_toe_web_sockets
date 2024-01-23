@@ -83,9 +83,6 @@ class ConnectionManager:
         self.connection_count = 0
         self.players_ID = []
         self.players_names = []
-        game_state.current_ID = None
-        game_state.first_score = 0
-        game_state.second_score = 0
         self.play_again.clear()
 
 connection_manager = ConnectionManager()
@@ -166,6 +163,11 @@ class GameState:
         self.winner = None
         self.current_ID = None
         self.current_player = None
+
+    def reset_state(self):
+        self.current_ID = None
+        self.first_score = 0
+        self.second_score = 0
     
 
 game_state = GameState()
@@ -190,6 +192,7 @@ async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
     connection_manager.setting_ID(client_id)
     try:
         while True:
+
             player_index = await websocket.receive_text()
 
             if player_index.isdigit():
@@ -219,19 +222,22 @@ async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
                 game_state.reset_board()
                 if (player_index == connection_manager.players_ID[1]):
                     game_state.current_player = 'O'
+
                 elif (player_index == connection_manager.players_ID[0]):
                     game_state.current_player = 'X'
-                game_state.play_again.add(player_index)
-                if len(game_state.play_again) == 1:
+
+                connection_manager.play_again.add(player_index)
+
+                if len(connection_manager.play_again) == 1:
                     await connection_manager.broadcast(json.dumps({
                         "message_type": "waiting_to_play_again",
                     }))
-                if len(game_state.play_again) == 2:
+                if len(connection_manager.play_again) == 2:
                     await connection_manager.broadcast(json.dumps({
                         "message_type": "ready_to_play",
                         "clientID": client_id,
                     }))
-                    game_state.play_again.clear()
+                    connection_manager.play_again.clear()
                 
 
     except WebSocketDisconnect:
@@ -239,3 +245,4 @@ async def websocket_endpoint_client(websocket: WebSocket, client_id: str):
         await connection_manager.broadcast(json.dumps({"message_type": "player_dc"}))
         await connection_manager.reset()
         game_state.reset_board()
+        game_state.reset_state()
