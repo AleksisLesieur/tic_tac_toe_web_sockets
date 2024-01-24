@@ -146,7 +146,7 @@ class GameState:
             if board[4] == 'O':
                 self.winner = 'O'
 
-        if self.is_board_full():
+        if self.is_board_full() and self.winner == None:
             self.winner = 'Tie'
 
         return self.winner
