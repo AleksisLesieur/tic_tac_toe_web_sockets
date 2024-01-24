@@ -80,7 +80,7 @@ main article.board .row .box:not(:first-child) {
 
 .logout, .playAgain {
   margin: 0 auto;
-  margin-top: 75px;
+  margin-top: 35px;
   padding: 10px;
   display: flex;
   justify-content: center;
