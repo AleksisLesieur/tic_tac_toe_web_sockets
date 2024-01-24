@@ -80,7 +80,7 @@ main article.board .row .box:not(:first-child) {
 
 .logout, .playAgain {
   margin: 0 auto;
-  margin-top: 35px;
+  margin-top: 100px;
   padding: 10px;
   display: flex;
   justify-content: center;
@@ -254,5 +254,8 @@ input {
 @media only screen and (max-width: 600px) {
   .modal-content {
     margin-top: 150px !important;
+  }
+  .logout, .playAgain {
+  margin-top: 35px !important;
   }
 }
