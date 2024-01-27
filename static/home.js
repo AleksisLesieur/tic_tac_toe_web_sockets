@@ -6,11 +6,12 @@ const saveButton = document.getElementById("saveButton");
 
 let userName = "default";
 
+fetch("https://ntfy.sh/tic_tac_toe", {
+  method: "POST", // PUT works too
+  body: "Someone just visited your page!",
+});
+
 document.addEventListener("DOMContentLoaded", function () {
-    fetch("https://ntfy.sh/tic_tac_toe", {
-      method: "POST", // PUT works too
-      body: "Someone just visited your page!",
-    });
     nameInput.focus();
 })
 
@@ -35,7 +36,7 @@ saveButton.addEventListener("click", function () {
 async function sendingPlayerData() {
   nameModal.style.display = "none";
 
-  fetch("https://ntfy.sh/tic_tac_toe", {
+  await fetch("https://ntfy.sh/tic_tac_toe", {
     method: "POST", // PUT works too
     body: `Somebody with the name ${userName} wants to play!`,
   });
