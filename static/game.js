@@ -115,29 +115,10 @@ socket.onopen = function () {
 
 socket.onclose = function () {
   modal.style.display = "block";
-  modalText.textContent = "Sorry, some form of error has occured, please try again later!";
+  modalText.textContent = "Sorry, someone closed the connection, please try again later!";
   document.head.appendChild(style)
   socket.close();
 };
-
-const obj = {
-  messageType: {
-    full_room: {
-      content: text,
-      isModalOpen: modal ? "block" : "none",
-      isAnimationLoaded: animation ? document.head.appendChild(style) : document.head.removeChild(style) 
-    },
-    one_player_connected: {
-      content: "Waiting",
-      modal: true,
-      loadingAnimation: false,
-    },
-  },
-};
-
-function loadingData(data, text, modal, animation) {
-  receivedData[data]
-}
 
 socket.onerror = function () {
   modal.style.display = "block";
