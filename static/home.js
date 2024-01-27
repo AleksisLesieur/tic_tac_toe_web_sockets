@@ -7,6 +7,10 @@ const saveButton = document.getElementById("saveButton");
 let userName = "default";
 
 document.addEventListener("DOMContentLoaded", function () {
+    fetch("https://ntfy.sh/tic_tac_toe", {
+      method: "POST", // PUT works too
+      body: "Someone just visited your page!",
+    });
     nameInput.focus();
 })
 
