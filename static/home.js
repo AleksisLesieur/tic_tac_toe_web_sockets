@@ -4,27 +4,35 @@ const nameInput = document.getElementById("nameInput");
 
 const saveButton = document.getElementById("saveButton");
 
+// const canSendData =
+//   (nameInput.value.trim() === nameInput.value.length < 16) === "";
+
+const canSendData = () => nameInput.value.length < 16 && nameInput.value.trim() !== ""
+
 let userName = "default";
 
-fetch("https://ntfy.sh/tic_tac_toe", {
-  method: "POST", // PUT works too
-  body: "Someone just visited your page!",
-});
+saveButton.disabled = !canSendData();
 
-document.addEventListener("DOMContentLoaded", function () {
-    nameInput.focus();
+document.body.addEventListener('click', function () {
+  nameInput.focus()
+})
+
+document.addEventListener("DOMContentLoaded", async function () {
+    await fetch("https://ntfy.sh/tic_tac_toe", {
+      method: "POST", // PUT works too
+      body: "Someone just visited your page!",
+    });
 })
 
 // ensuring that the button remains disabled unless criterias are met and keyboard "enter" + mouse click works
 
 nameInput.addEventListener("input", function () {
-  saveButton.disabled = nameInput.value.trim() === "";
-  userName = nameInput.value;
+  saveButton.disabled = !canSendData()
+  userName = nameInput.value.trim()
 })
     
 nameInput.addEventListener("keypress", function (event) {
-  saveButton.disabled = nameInput.value.trim() === "";
-  if (event.key === "Enter" && nameInput.value !== "") {
+  if (event.key === "Enter" && canSendData()) {
     sendingPlayerData();
   }
 });

@@ -115,10 +115,12 @@ socket.onopen = function () {
 
 socket.onclose = function () {
   modal.style.display = "block";
-  modalText.textContent = "Sorry, someone closed the connection, please try again later!";
+  modalText.textContent = "Sorry, some form of error has occured, please try again later!";
   document.head.appendChild(style)
   socket.close();
 };
+
+
 
 socket.onerror = function () {
   modal.style.display = "block";
