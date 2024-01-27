@@ -23,7 +23,7 @@ nameInput.addEventListener("input", function () {
     
 nameInput.addEventListener("keypress", function (event) {
   saveButton.disabled = nameInput.value.trim() === "";
-  if (event.key === "Enter") {
+  if (event.key === "Enter" && nameInput.value !== "") {
     sendingPlayerData();
   }
 });
