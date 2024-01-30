@@ -4,10 +4,12 @@ const nameInput = document.getElementById("nameInput");
 
 const saveButton = document.getElementById("saveButton");
 
+const warning = document.querySelector('.warning')
+
 // const canSendData =
 //   (nameInput.value.trim() === nameInput.value.length < 16) === "";
 
-const canSendData = () => nameInput.value.length < 16 && nameInput.value.trim() !== ""
+const canSendData = () => nameInput.value.length <= 15 && nameInput.value.trim() !== ""
 
 let userName = "default";
 
@@ -29,6 +31,15 @@ document.addEventListener("DOMContentLoaded", async function () {
 nameInput.addEventListener("input", function () {
   saveButton.disabled = !canSendData()
   userName = nameInput.value.trim()
+  if (nameInput.value.length === 0) {
+    warning.textContent = `The "name" field can't be empty! Please write your name`;
+  }
+  if (nameInput.value.length > 0 && nameInput.value.length <= 15) {
+    warning.textContent = ''
+  }
+  if (nameInput.value.length > 16) {
+    warning.textContent = `The "name" field can't accept more than 15 characters!`;
+  }
 })
     
 nameInput.addEventListener("keypress", function (event) {

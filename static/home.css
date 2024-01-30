@@ -8,11 +8,11 @@ body.modal-open {
     overflow: hidden;
 }
 
-.greetings, label{
+.greetings, label, .warning {
     font-size: 2em;
 }
 
-input, #saveButton {
+input, #saveButton{
     font-size: 1.5em;
 }
 
@@ -62,6 +62,12 @@ input {
     margin-bottom: 20px;
     padding: 8px;
     box-sizing: border-box;
+}
+
+.warning {
+    color: red;
+    text-align: left !important;
+    padding-bottom: 20px;
 }
 
 #saveButton {
