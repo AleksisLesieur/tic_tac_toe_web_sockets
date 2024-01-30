@@ -37,7 +37,7 @@ nameInput.addEventListener("input", function () {
   if (nameInput.value.length > 0 && nameInput.value.length <= 15) {
     warning.textContent = ''
   }
-  if (nameInput.value.length > 16) {
+  if (nameInput.value.length >= 16) {
     warning.textContent = `The "name" field can't accept more than 15 characters!`;
   }
 })
@@ -77,4 +77,5 @@ async function sendingPlayerData() {
     return response.json();
   }
 }
+
 
