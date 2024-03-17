@@ -5,7 +5,7 @@ Welcome to the Online Tic Tac Toe Game! This project allows you to play Tic Tac 
 ## Features
 - **Play Against Me:** You can play against me, the creator of this game.
 - **Notification System:** When you visit the page, I will receive a notification on my ntfy app, indicating that someone wants to play against me.
-- **Alternate Opponent:** In case I'm unavailable, you can play against somebody else in the office.
+- **Alternate Opponent:** In case I'm unavailable, you can play against somebody else (your friend, your colleague, etc...)
 
 ## Technologies Used
 - **Frontend:**
