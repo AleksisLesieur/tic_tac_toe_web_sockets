@@ -23,7 +23,7 @@ Welcome to the Online Tic Tac Toe Game! This project allows you to play Tic Tac 
 2. Input a name between 1-15 characters long.
 3. Confirm your name and wait for me to join.
 4. If I'm not joining after 2 minutes, feel free to play against one of your colleagues.
-5. You're now playing a game of Tic Tac Toe with me!
+5. You're now playing a game of Tic Tac Toe online!
 
 ## Note
 - **Limited Players:** Only two players are allowed to join the game at a time. This means no third or fourth user can join.
