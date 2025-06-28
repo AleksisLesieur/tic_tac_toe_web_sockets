@@ -12,7 +12,7 @@ const modalText = document.querySelector(".modal-text");
 
 const Logout = document.querySelector(".logout");
 
-let playerID = crypto.randomUUID();
+let playerID = Date.now().toString() + Math.random().toString(36);
 
 const url = `http://${window.location.host}/`;
 
